@@ -62,11 +62,6 @@
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
-    // --- Глобальные переменные для Firebase и состояния игры ---
-    let db, auth, userId, appId;
-    const appContainer = document.getElementById('app-container');
-    const loadingScreen = document.getElementById('loading-screen');
-
     // --- ВАША ПЕРСОНАЛЬНАЯ КОНФИГУРАЦИЯ FIREBASE ---
     const firebaseConfig = {
         apiKey: "AIzaSyDFWm4OyjHgAsgVTMkhApeGaAZC5CSXEi8",
@@ -77,6 +72,13 @@
         appId: "1:1002159529192:web:cac088727395f079e9fd5d",
         measurementId: "G-29FH6CDF19"
     };
+
+    // --- Глобальные переменные для Firebase и состояния игры ---
+    let db, auth, userId; // Убрали 'appId' отсюда, так как он будет константой
+    const appContainer = document.getElementById('app-container');
+    const loadingScreen = document.getElementById('loading-screen');
+    const appId = 53820374; // <-- ИСПРАВЛЕНО: ЖЕСТКО ЗАДАЕМ ID ВАШЕГО ПРИЛОЖЕНИЯ ВК
+
 
     // --- ЗАГЛУШКА VK BRIDGE ДЛЯ ТЕСТИРОВАНИЯ В БРАУЗЕРЕ ---
     if (typeof vkBridge === 'undefined') {
