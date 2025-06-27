@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=no, viewport-fit=cover">
     <title>Симулятор Бота «Атлант»</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -15,42 +15,42 @@
         .keyboard-grid button { transition: all 0.2s ease-in-out; }
         .keyboard-grid button:active { transform: scale(0.95); }
         .bonus-card {
-        background-image: url('https://img.freepik.com/free-vector/abstract-plexus-background-with-connecting-dots-lines_1017-23348.jpg?w=1380&t=st=1719427845~exp=1719428445~hmac=e20f269a31a4c0a5d4e135b026615b3c3b53f6834b126ac002b4742e7428f522');
-        background-size: cover;
-        background-position: center;
-        border: 1px solid #718096;
-        position: relative;
-    }
+            background-image: url('https://img.freepik.com/free-vector/abstract-plexus-background-with-connecting-dots-lines_1017-23348.jpg?w=1380&t=st=1719427845~exp=1719428445~hmac=e20f269a31a4c0a5d4e135b026615b3c3b53f6834b126ac002b4742e7428f522');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #718096;
+            position: relative;
+        }
         .bonus-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(45, 55, 72, 0.7);
-        border-radius: 0.75rem;
-    }
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(45, 55, 72, 0.7);
+            border-radius: 0.75rem;
+        }
         .bonus-card > * {
-        position: relative;
-        z-index: 10;
-    }
+            position: relative;
+            z-index: 10;
+        }
         .loader {
-        border: 4px solid #f3f3f3;
-        border-radius: 50%;
-        border-top: 4px solid #3498db;
-        width: 40px;
-        height: 40px;
-        animation: spin 2s linear infinite;
-    }
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
         @keyframes spin {
-        0% {
-            transform: rotate(0deg);
-    }
-        100% {
-        transform: rotate(360deg);
-    }
-    }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-2 md:p-4">
@@ -61,7 +61,7 @@
         <div class="relative">
             <img id="bot-avatar" class="w-12 h-12 rounded-full" src="https://placehold.co/100x100/1a202c/ffffff?text=M"
                  alt="Аватар Бота">
-                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></span>
+            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></span>
         </div>
         <div>
             <h1 id="bot-name" class="text-xl font-bold">Атлант Бот</h1>
@@ -87,14 +87,14 @@
 
     // --- ВАША ПЕРСОНАЛЬНАЯ КОНФИГУРАЦИЯ FIREBASE ---
     const firebaseConfig = {
-    apiKey: "AIzaSyDFWm4OyjHgAsgVTMkhApeGaAZC5CSXEi8",
-    authDomain: "atlant-bot-1d0d5.firebaseapp.com",
-    projectId: "atlant-bot-1d0d5",
-    storageBucket: "atlant-bot-1d0d5.firebasestorage.app",
-    messagingSenderId: "1002159529192",
-    appId: "1:1002159529192:web:cac088727395f079e9fd5d",
-    measurementId: "G-29FH6CDF19"
-};
+        apiKey: "AIzaSyDFWm4OyjHgAsgVTMkhApeGaAZC5CSXEi8",
+        authDomain: "atlant-bot-1d0d5.firebaseapp.com",
+        projectId: "atlant-bot-1d0d5",
+        storageBucket: "atlant-bot-1d0d5.firebasestorage.app",
+        messagingSenderId: "1002159529192",
+        appId: "1:1002159529192:web:cac088727395f079e9fd5d",
+        measurementId: "G-29FH6CDF19"
+    };
 
     // --- Глобальные переменные для Firebase и состояния игры ---
     let db, auth, userId;
@@ -104,56 +104,56 @@
 
     // --- ЗАГЛУШКА VK BRIDGE ДЛЯ ТЕСТИРОВАНИЯ В БРАУЗЕРЕ ---
     if (typeof vkBridge === 'undefined') {
-    console.warn('VK Bridge не найден. Используется мок-объект для разработки.');
-    window.vkBridge = {
-    send: (method, params) => {
-    console.log('Вызов мок-объекта VK Bridge:', method, params);
-    return new Promise((resolve, reject) => {
-    switch (method) {
-    case 'VKWebAppInit':
-    resolve({ result: true });
-    break;
-    case 'VKWebAppGetUserInfo':
-    resolve({ id: 1, first_name: 'Павел', last_name: 'Дуров', photo_100: 'https://placehold.co/100x100/7f9aed/ffffff?text=VK' });
-    break;
-    case 'VKWebAppOpenPayForm':
-    // Имитируем успешную оплату для тестирования
-    // Вместо alert используем console.log для симуляции, чтобы не блокировать UI
-    console.log(`Мок-оплата за: ${params.params.item}. Цена: ${params.params.price} голосов.`);
-    resolve({ status: 'success', transaction_id: 'MOCK_TRANSACTION_123' });
-    break;
-    default:
-    resolve({ result: true });
-}
-});
-}
-};
-}
+        console.warn('VK Bridge не найден. Используется мок-объект для разработки.');
+        window.vkBridge = {
+            send: (method, params) => {
+                console.log('Вызов мок-объекта VK Bridge:', method, params);
+                return new Promise((resolve, reject) => {
+                    switch (method) {
+                        case 'VKWebAppInit':
+                            resolve({ result: true });
+                            break;
+                        case 'VKWebAppGetUserInfo':
+                            resolve({ id: 1, first_name: 'Павел', last_name: 'Дуров', photo_100: 'https://placehold.co/100x100/7f9aed/ffffff?text=VK' });
+                            break;
+                        case 'VKWebAppOpenPayForm':
+                            // Имитируем успешную оплату для тестирования
+                            // Вместо alert используем console.log для симуляции, чтобы не блокировать UI
+                            console.log(`Мок-оплата за: ${params.params.item}. Цена: ${params.params.price} голосов.`);
+                            resolve({ status: 'success', transaction_id: 'MOCK_TRANSACTION_123' });
+                            break;
+                        default:
+                            resolve({ result: true });
+                    }
+                });
+            }
+        };
+    }
 
     // --- КОНФИГУРАЦИЯ ИГРЫ ---
     const config = {
-    workContracts: [
-{ id: 1, title: "Доставка пиццы", duration: 60, minReward: 5000, maxReward: 10000, risk: 0.1, requiredLevel: 1 },
-{ id: 2, title: "Перевозка мебели", duration: 180, minReward: 30000, maxReward: 50000, risk: 0.2, requiredLevel: 5 },
-{ id: 3, title: "Контрабанда чипов", duration: 300, minReward: 100000, maxReward: 250000, risk: 0.4, requiredLevel: 10 },
-    ],
-    cases: {
-    'basic_case': { id: 'basic_case', name: "Базовый кейс", icon: "📦", possibleLoot: [50000, 100000, 200000, 300000, 500000] },
-    'pro_case': { id: 'pro_case', name: "Про-кейс", icon: "💼", possibleLoot: [100000, 200000, 350000, 500000, 750000] },
-    'elite_case': { id: 'elite_case', name: "Элитный кейс", icon: "👑", possibleLoot: [150000, 300000, 450000, 600000, 750000] },
-    'ultra_case': { id: 'ultra_case', name: "Ультра кейс", icon: "💎", possibleLoot: [250000, 500000, 750000, 1000000, 1500000] }
-},
-    donationCases: {
-    'starter_pack': { id: 'starter_pack', name: 'Набор Новичка', icon: '🚀', price: 10, content: { balance: 500000, items: [{ id: 'basic_case', quantity: 5, type: 'case', name: 'Базовый кейс', icon: '📦' }] } },
-    'tycoon_case': { id: 'tycoon_case', name: 'Кейс Бизнесмена', icon: '🎩', price: 50, content: { balance: 2500000, items: [{ id: 'pro_case', quantity: 3, type: 'case', name: 'Про-кейс', icon: '💼' }, { id: 'elite_case', quantity: 1, type: 'case', name: 'Элитный кейс', icon: '👑' }] } },
-    'investor_bundle': { id: 'investor_bundle', name: 'Набор Инвестора', icon: '📈', price: 100, content: { bitcoin: 50, euro: 100, items: [{ id: 'ultra_case', quantity: 2, type: 'case', name: 'Ультра кейс', icon: '💎' }] } }
-},
-    businessesForSale: [
-{ id: 12, name: "Китайский ресторан", price: 35000000, profit: 154000 },
-{ id: 15, name: "Шаурмичная", price: 5000000, profit: 25000 },
-{ id: 18, name: "Автосервис", price: 50000000, profit: 250000 },
-    ]
-};
+        workContracts: [
+            { id: 1, title: "Доставка пиццы", duration: 60, minReward: 5000, maxReward: 10000, risk: 0.1, requiredLevel: 1 },
+            { id: 2, title: "Перевозка мебели", duration: 180, minReward: 30000, maxReward: 50000, risk: 0.2, requiredLevel: 5 },
+            { id: 3, title: "Контрабанда чипов", duration: 300, minReward: 100000, maxReward: 250000, risk: 0.4, requiredLevel: 10 },
+        ],
+        cases: {
+            'basic_case': { id: 'basic_case', name: "Базовый кейс", icon: "📦", possibleLoot: [50000, 100000, 200000, 300000, 500000] },
+            'pro_case': { id: 'pro_case', name: "Про-кейс", icon: "💼", possibleLoot: [100000, 200000, 350000, 500000, 750000] },
+            'elite_case': { id: 'elite_case', name: "Элитный кейс", icon: "👑", possibleLoot: [150000, 300000, 450000, 600000, 750000] },
+            'ultra_case': { id: 'ultra_case', name: "Ультра кейс", icon: "💎", possibleLoot: [250000, 500000, 750000, 1000000, 1500000] }
+        },
+        donationCases: {
+            'starter_pack': { id: 'starter_pack', name: 'Набор Новичка', icon: '🚀', price: 10, content: { balance: 500000, items: [{ id: 'basic_case', quantity: 5, type: 'case', name: 'Базовый кейс', icon: '📦' }] } },
+            'tycoon_case': { id: 'tycoon_case', name: 'Кейс Бизнесмена', icon: '🎩', price: 50, content: { balance: 2500000, items: [{ id: 'pro_case', quantity: 3, type: 'case', name: 'Про-кейс', icon: '💼' }, { id: 'elite_case', quantity: 1, type: 'case', name: 'Элитный кейс', icon: '👑' }] } },
+            'investor_bundle': { id: 'investor_bundle', name: 'Набор Инвестора', icon: '📈', price: 100, content: { bitcoin: 50, euro: 100, items: [{ id: 'ultra_case', quantity: 2, type: 'case', name: 'Ультра кейс', icon: '💎' }] } }
+        },
+        businessesForSale: [
+            { id: 12, name: "Китайский ресторан", price: 35000000, profit: 154000 },
+            { id: 15, name: "Шаурмичная", price: 5000000, profit: 25000 },
+            { id: 18, name: "Автосервис", price: 50000000, profit: 250000 },
+        ]
+    };
 
     // --- СОСТОЯНИЕ ИГРЫ ---
     let gameState = {};
@@ -174,162 +174,162 @@
 
     // --- СОХРАНЕНИЕ ДАННЫХ В FIRESTORE ---
     async function savePlayerState() {
-    if (!db || !userId) return;
-    try {
-    const stateToSave = JSON.parse(JSON.stringify(gameState.player));
-    const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
-    await setDoc(playerDocRef, stateToSave);
-} catch (error) {
-    console.error("Ошибка сохранения данных игрока: ", error);
-    addBotMessage('<p class="text-red-400">⚠️ Ошибка сохранения прогресса. Попробуйте позже.</p>');
-}
-}
+        if (!db || !userId) return;
+        try {
+            const stateToSave = JSON.parse(JSON.stringify(gameState.player));
+            const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
+            await setDoc(playerDocRef, stateToSave);
+        } catch (error) {
+            console.error("Ошибка сохранения данных игрока: ", error);
+            addBotMessage('<p class="text-red-400">⚠️ Ошибка сохранения прогресса. Попробуйте позже.</p>');
+        }
+    }
 
     // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ ---
     function addBotMessage(text, asHtml = false) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'flex justify-start items-start space-x-2';
-    messageDiv.innerHTML = `
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'flex justify-start items-start space-x-2';
+        messageDiv.innerHTML = `
             <img class="w-8 h-8 rounded-full flex-shrink-0" src="https://placehold.co/100x100/1a202c/ffffff?text=B" alt="Аватар Бота">
             <div class="bg-gray-700 text-white p-3 rounded-xl rounded-tl-none chat-bubble">
                 ${asHtml ? text : `<p>${text}</p>`}
             </div>
         `;
-    chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
     function addUserMessage(text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'flex justify-end items-start space-x-2';
-    messageDiv.innerHTML = `
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'flex justify-end items-start space-x-2';
+        messageDiv.innerHTML = `
             <div class="bg-blue-600 text-white p-3 rounded-xl rounded-tr-none chat-bubble">
                 <p>${text}</p>
             </div>
             <img class="w-8 h-8 rounded-full flex-shrink-0" src="${document.getElementById('bot-avatar').src}" alt="Аватар Пользователя">
         `;
-    chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
     function renderKeyboard(buttons = []) {
-    keyboardArea.innerHTML = ''; // Очищаем клавиатуру
-    const gridDiv = document.createElement('div');
-    gridDiv.className = 'keyboard-grid grid grid-cols-2 gap-2';
+        keyboardArea.innerHTML = ''; // Очищаем клавиатуру
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'keyboard-grid grid grid-cols-2 gap-2';
 
-    if (buttons.length === 0) { // Если кнопки не переданы, показываем главное меню
-    switch (gameState.currentMenu) {
-    case 'main':
-    buttons = [
-{ label: '⚙️ Профиль', command: 'view_profile', isNav: true },
-{ label: '💼 Работа', command: 'view_work', isNav: true },
-{ label: '🏦 Банк', command: 'view_bank', isNav: true },
-{ label: '📈 Рынок', command: 'view_market', isNav: true },
-{ label: '🛍️ Магазин', command: 'view_shop', isNav: true },
-{ label: '🎁 Бонусы', command: 'get_bonus' }
-    ];
-    break;
-    case 'profile':
-    buttons = [
-{ label: '📊 Статистика', command: 'profile_stats' },
-{ label: '⬆️ Уровни', command: 'profile_levels' },
-{ label: '🏢 Бизнесы', command: 'profile_businesses' },
-{ label: '📦 Инвентарь', command: 'profile_inventory', isNav: true },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'work':
-    buttons = [
-{ label: 'Доставка пиццы (1-5к)', command: 'work_start 1' },
-{ label: 'Перевозка мебели (30-50к)', command: 'work_start 2' },
-{ label: 'Контрабанда чипов (100-250к)', command: 'work_start 3' },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'bank':
-    buttons = [
-{ label: '⛏️ Майнинг', command: 'view_mining', isNav: true },
-{ label: '💰 Вклады', command: 'view_deposits', isNav: true },
-{ label: '👴 Пенсия', command: 'bank_pension' },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'mining':
-    const miningActive = gameState.player.mining && gameState.player.mining.active;
-    buttons = [
-    miningActive ? { label: '💎 Забрать BTC', command: 'mining_claim' } : { label: '⛏️ Активировать Майнинг', command: 'mining_activate' },
-{ label: '⬆️ Улучшить Майнер', command: 'mining_upgrade_prompt' },
-{ label: '💲 Продать BTC', command: 'mining_sell_prompt' },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'deposits':
-    buttons = [
-{ label: '➕ Открыть вклад', command: 'deposit_create_prompt' },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'market':
-    buttons = [
-{ label: '🏢 Купить бизнес', command: 'market_businesses', isNav: true },
-{ label: '🎁 Промокоды', command: 'view_promo', isNav: true },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'promo':
-    buttons = [
-{ label: '➕ Создать промокод', command: 'promo_create_prompt' },
-{ label: '🎁 Активировать промокод', command: 'promo_activate_prompt' },
-{ label: '↩️ Назад', command: 'back', isNav: true }
-    ];
-    break;
-    case 'inventory':
-    buttons = [];
-    if (gameState.player.inventory && gameState.player.inventory.length > 0) {
-    gameState.player.inventory.forEach(item => {
-    if (item.type === 'case') {
-    buttons.push({ label: `${item.icon} ${item.name} (${item.quantity})`, command: `item_manage ${item.id}`, isNav: true });
-}
-});
-}
-    buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
-    break;
-    case 'item_management': // Новое состояние для управления предметом
-    buttons = [
-{ label: '➕ Открыть 1', command: `case_open ${gameState.currentManagedItemId} 1` },
-{ label: '➕ Открыть 5', command: `case_open ${gameState.currentManagedItemId} 5` },
-{ label: '➕ Открыть 10', command: `case_open ${gameState.currentManagedItemId} 10` },
-{ label: '↩️ Назад', command: 'view_inventory', isNav: true }
-    ];
-    break;
-    case 'shop': // Новое состояние для магазина
-    for (const key in config.donationCases) {
-    const item = config.donationCases[key];
-    buttons.push({ label: `Купить ${item.name} (${item.price} гол.)`, command: `shop_buy ${item.id}` });
-}
-    buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
-    break;
-    case 'input': // Клавиатура для ввода
-    // Здесь мы не рендерим кнопки, так как ожидается ввод
-    break;
-}
-}
+        if (buttons.length === 0) { // Если кнопки не переданы, показываем главное меню
+            switch (gameState.currentMenu) {
+                case 'main':
+                    buttons = [
+                        { label: '⚙️ Профиль', command: 'view_profile', isNav: true },
+                        { label: '💼 Работа', command: 'view_work', isNav: true },
+                        { label: '🏦 Банк', command: 'view_bank', isNav: true },
+                        { label: '📈 Рынок', command: 'view_market', isNav: true },
+                        { label: '🛍️ Магазин', command: 'view_shop', isNav: true },
+                        { label: '🎁 Бонусы', command: 'get_bonus' }
+                    ];
+                    break;
+                case 'profile':
+                    buttons = [
+                        { label: '📊 Статистика', command: 'profile_stats' },
+                        { label: '⬆️ Уровни', command: 'profile_levels' },
+                        { label: '🏢 Бизнесы', command: 'profile_businesses' },
+                        { label: '📦 Инвентарь', command: 'profile_inventory', isNav: true },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'work':
+                    buttons = [
+                        { label: 'Доставка пиццы (1-5к)', command: 'work_start 1' },
+                        { label: 'Перевозка мебели (30-50к)', command: 'work_start 2' },
+                        { label: 'Контрабанда чипов (100-250к)', command: 'work_start 3' },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'bank':
+                    buttons = [
+                        { label: '⛏️ Майнинг', command: 'view_mining', isNav: true },
+                        { label: '💰 Вклады', command: 'view_deposits', isNav: true },
+                        { label: '👴 Пенсия', command: 'bank_pension' },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'mining':
+                    const miningActive = gameState.player.mining && gameState.player.mining.active;
+                    buttons = [
+                        miningActive ? { label: '💎 Забрать BTC', command: 'mining_claim' } : { label: '⛏️ Активировать Майнинг', command: 'mining_activate' },
+                        { label: '⬆️ Улучшить Майнер', command: 'mining_upgrade_prompt' },
+                        { label: '💲 Продать BTC', command: 'mining_sell_prompt' },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'deposits':
+                    buttons = [
+                        { label: '➕ Открыть вклад', command: 'deposit_create_prompt' },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'market':
+                    buttons = [
+                        { label: '🏢 Купить бизнес', command: 'market_businesses', isNav: true },
+                        { label: '🎁 Промокоды', command: 'view_promo', isNav: true },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'promo':
+                    buttons = [
+                        { label: '➕ Создать промокод', command: 'promo_create_prompt' },
+                        { label: '🎁 Активировать промокод', command: 'promo_activate_prompt' },
+                        { label: '↩️ Назад', command: 'back', isNav: true }
+                    ];
+                    break;
+                case 'inventory':
+                    buttons = [];
+                    if (gameState.player.inventory && gameState.player.inventory.length > 0) {
+                        gameState.player.inventory.forEach(item => {
+                            if (item.type === 'case') {
+                                buttons.push({ label: `${item.icon} ${item.name} (${item.quantity})`, command: `item_manage ${item.id}`, isNav: true });
+                            }
+                        });
+                    }
+                    buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
+                    break;
+                case 'item_management': // Новое состояние для управления предметом
+                    buttons = [
+                        { label: '➕ Открыть 1', command: `case_open ${gameState.currentManagedItemId} 1` },
+                        { label: '➕ Открыть 5', command: `case_open ${gameState.currentManagedItemId} 5` },
+                        { label: '➕ Открыть 10', command: `case_open ${gameState.currentManagedItemId} 10` },
+                        { label: '↩️ Назад', command: 'view_inventory', isNav: true }
+                    ];
+                    break;
+                case 'shop': // Новое состояние для магазина
+                    for (const key in config.donationCases) {
+                        const item = config.donationCases[key];
+                        buttons.push({ label: `Купить ${item.name} (${item.price} гол.)`, command: `shop_buy ${item.id}` });
+                    }
+                    buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
+                    break;
+                case 'input': // Клавиатура для ввода
+                    // Здесь мы не рендерим кнопки, так как ожидается ввод
+                    break;
+            }
+        }
 
-    buttons.forEach(btn => {
-    const button = document.createElement('button');
-    button.className = 'bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-xl text-lg transition duration-200 ease-in-out';
-    button.textContent = btn.label;
-    button.onclick = () => window.sendCommand(btn.command, btn.label, btn.isNav); // Передаем label и isNav
-    gridDiv.appendChild(button);
-});
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.className = 'bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-xl text-lg transition duration-200 ease-in-out';
+            button.textContent = btn.label;
+            button.onclick = () => window.sendCommand(btn.command, btn.label, btn.isNav); // Передаем label и isNav
+            gridDiv.appendChild(button);
+        });
 
-    keyboardArea.appendChild(gridDiv);
+        keyboardArea.appendChild(gridDiv);
 
-    // Если ожидается ввод, добавляем поле ввода и кнопку отправки
-    if (gameState.prompt) {
-    const inputGroup = document.createElement('div');
-    inputGroup.className = 'mt-3 flex space-x-2';
-    inputGroup.innerHTML = `
+        // Если ожидается ввод, добавляем поле ввода и кнопку отправки
+        if (gameState.prompt) {
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'mt-3 flex space-x-2';
+            inputGroup.innerHTML = `
                 <input type="text" id="text-input" placeholder="${gameState.prompt.placeholder || 'Введите что-то...'}"
                        class="flex-1 bg-gray-700 text-white p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                        onkeydown="if(event.keyCode===13) window.submitInput()">
@@ -338,147 +338,147 @@
                     Отправить
                 </button>
             `;
-    keyboardArea.appendChild(inputGroup);
-    document.getElementById('text-input').focus();
-}
-}
+            keyboardArea.appendChild(inputGroup);
+            document.getElementById('text-input').focus();
+        }
+    }
 
     function renderInput(placeholder, prevView = null) {
-    gameState.prompt = { placeholder, prevView };
-    renderKeyboard([]); // Рендерим пустую клавиатуру, чтобы показать только инпут
-}
+        gameState.prompt = { placeholder, prevView };
+        renderKeyboard([]); // Рендерим пустую клавиатуру, чтобы показать только инпут
+    }
 
     function showView(viewName) {
-    if (gameState.currentMenu !== viewName && !['input', 'prompt'].includes(viewName)) {
-    gameState.menuHistory.push(gameState.currentMenu);
-}
-    gameState.currentMenu = viewName;
-    renderKeyboard();
-}
+        if (gameState.currentMenu !== viewName && !['input', 'prompt'].includes(viewName)) {
+            gameState.menuHistory.push(gameState.currentMenu);
+        }
+        gameState.currentMenu = viewName;
+        renderKeyboard();
+    }
 
     function goBack() {
-    if (gameState.menuHistory.length > 0) {
-    const prevMenu = gameState.menuHistory.pop();
-    gameState.currentMenu = prevMenu;
-    renderKeyboard();
-} else {
-    showView('main'); // Если нет истории, возвращаемся в главное меню
-}
-}
+        if (gameState.menuHistory.length > 0) {
+            const prevMenu = gameState.menuHistory.pop();
+            gameState.currentMenu = prevMenu;
+            renderKeyboard();
+        } else {
+            showView('main'); // Если нет истории, возвращаемся в главное меню
+        }
+    }
 
     function backToMain() {
-    gameState.menuHistory = []; // Очищаем историю
-    showView('main');
-}
+        gameState.menuHistory = []; // Очищаем историю
+        showView('main');
+    }
 
     async function startWork(contractId) {
-    const contract = config.workContracts.find(c => c.id === contractId);
-    if (!contract) { addBotMessage("<p>Такой работы не найдено.</p>"); return; }
+        const contract = config.workContracts.find(c => c.id === contractId);
+        if (!contract) { addBotMessage("<p>Такой работы не найдено.</p>"); return; }
 
-    const p = gameState.player;
-    if (p.level < contract.requiredLevel) {
-    addBotMessage(`<p>❌ Для этой работы нужен уровень ${contract.requiredLevel}. У вас ${p.level}.</p>`);
-    return;
-}
-    if (p.currentWork && p.currentWork.endTime > Date.now()) {
-    addBotMessage("<p>⚠️ Вы уже на работе! Дождитесь завершения.</p>");
-    return;
-}
+        const p = gameState.player;
+        if (p.level < contract.requiredLevel) {
+            addBotMessage(`<p>❌ Для этой работы нужен уровень ${contract.requiredLevel}. У вас ${p.level}.</p>`);
+            return;
+        }
+        if (p.currentWork && p.currentWork.endTime > Date.now()) {
+            addBotMessage("<p>⚠️ Вы уже на работе! Дождитесь завершения.</p>");
+            return;
+        }
 
-    p.currentWork = {
-    contractId: contract.id,
-    startTime: Date.now(),
-    endTime: Date.now() + contract.duration * 1000 // Convert seconds to milliseconds
-};
-    addBotMessage(`<p>✅ Вы приступили к работе "${contract.title}". Завершение через ${formatTime(contract.duration * 1000)}.</p>`);
-    await savePlayerState();
-    showView('work');
-}
+        p.currentWork = {
+            contractId: contract.id,
+            startTime: Date.now(),
+            endTime: Date.now() + contract.duration * 1000 // Convert seconds to milliseconds
+        };
+        addBotMessage(`<p>✅ Вы приступили к работе "${contract.title}". Завершение через ${formatTime(contract.duration * 1000)}.</p>`);
+        await savePlayerState();
+        showView('work');
+    }
 
     // Функция, которая вызывается периодически (например, setInterval)
     async function gameTick() {
-    const p = gameState.player;
+        const p = gameState.player;
 
-    // Проверка завершения работы
-    if (p.currentWork && p.currentWork.endTime <= Date.now()) {
-    const contract = config.workContracts.find(c => c.id === p.currentWork.contractId);
-    if (contract) {
-    let reward = Math.floor(Math.random() * (contract.maxReward - contract.minReward + 1)) + contract.minReward;
-    const riskFactor = Math.random();
-    let message = `<p>✅ Работа "${contract.title}" завершена! Вы заработали ${formatCurrency(reward)}.</p>`;
-    if (riskFactor < contract.risk) {
-    reward = Math.floor(reward * 0.5); // Уменьшаем награду в случае риска
-    message = `<p class="text-yellow-400">⚠️ Работа "${contract.title}" завершена с приключениями. Вы заработали ${formatCurrency(reward)} (обычно больше).</p>`;
-}
-    p.balance += reward;
-    p.xp += 2; // Опыт за работу
-    addBotMessage(message);
-    checkLevelUp();
-}
-    p.currentWork = null; // Сбрасываем текущую работу
-    await savePlayerState();
-    showView('work'); // Обновляем клавиатуру, если нужно
-}
+        // Проверка завершения работы
+        if (p.currentWork && p.currentWork.endTime <= Date.now()) {
+            const contract = config.workContracts.find(c => c.id === p.currentWork.contractId);
+            if (contract) {
+                let reward = Math.floor(Math.random() * (contract.maxReward - contract.minReward + 1)) + contract.minReward;
+                const riskFactor = Math.random();
+                let message = `<p>✅ Работа "${contract.title}" завершена! Вы заработали ${formatCurrency(reward)}.</p>`;
+                if (riskFactor < contract.risk) {
+                    reward = Math.floor(reward * 0.5); // Уменьшаем награду в случае риска
+                    message = `<p class="text-yellow-400">⚠️ Работа "${contract.title}" завершена с приключениями. Вы заработали ${formatCurrency(reward)} (обычно больше).</p>`;
+                }
+                p.balance += reward;
+                p.xp += 2; // Опыт за работу
+                addBotMessage(message);
+                checkLevelUp();
+            }
+            p.currentWork = null; // Сбрасываем текущую работу
+            await savePlayerState();
+            showView('work'); // Обновляем клавиатуру, если нужно
+        }
 
-    // Проверка майнинга
-    if (p.mining && p.mining.active && p.mining.lastMined + p.mining.interval <= Date.now()) {
-    p.bitcoin += p.mining.speed;
-    p.mining.lastMined = Date.now();
-    await savePlayerState();
-    // addBotMessage(`<p>⛏️ Ваш майнер намайнил ${formatBTC(p.mining.speed)}!</p>`); // Опционально: уведомление о майнинге
-}
+        // Проверка майнинга
+        if (p.mining && p.mining.active && p.mining.lastMined + p.mining.interval <= Date.now()) {
+            p.bitcoin += p.mining.speed;
+            p.mining.lastMined = Date.now();
+            await savePlayerState();
+            // addBotMessage(`<p>⛏️ Ваш майнер намайнил ${formatBTC(p.mining.speed)}!</p>`); // Опционально: уведомление о майнинге
+        }
 
-    // Проверка вкладов
-    for (let i = 0; i < p.deposits.length; i++) {
-    const deposit = p.deposits[i];
-    if (!deposit.claimed && deposit.payoutTime <= Date.now()) {
-    const interest = deposit.amount * (deposit.rate / 100);
-    const totalReturn = deposit.amount + interest;
-    p.balance += totalReturn;
-    deposit.claimed = true; // Отмечаем вклад как забранный
-    addBotMessage(`<p>🏦 Ваш вклад на ${formatCurrency(deposit.amount)} успешно завершен! Вы получили ${formatCurrency(totalReturn)} (чистая прибыль ${formatCurrency(interest)}).</p>`);
-    await savePlayerState();
-}
-}
-    p.deposits = p.deposits.filter(d => !d.claimed); // Удаляем забранные вклады
+        // Проверка вкладов
+        for (let i = 0; i < p.deposits.length; i++) {
+            const deposit = p.deposits[i];
+            if (!deposit.claimed && deposit.payoutTime <= Date.now()) {
+                const interest = deposit.amount * (deposit.rate / 100);
+                const totalReturn = deposit.amount + interest;
+                p.balance += totalReturn;
+                deposit.claimed = true; // Отмечаем вклад как забранный
+                addBotMessage(`<p>🏦 Ваш вклад на ${formatCurrency(deposit.amount)} успешно завершен! Вы получили ${formatCurrency(totalReturn)} (чистая прибыль ${formatCurrency(interest)}).</p>`);
+                await savePlayerState();
+            }
+        }
+        p.deposits = p.deposits.filter(d => !d.claimed); // Удаляем забранные вклады
 
 
-    // Начисление прибыли от бизнесов
-    for (let i = 0; i < p.businesses.length; i++) {
-    const business = p.businesses[i];
-    const now = Date.now();
-    const lastPayout = business.lastPayout || p.joinDate; // Используем joinDate если lastPayout еще не установлен
+        // Начисление прибыли от бизнесов
+        for (let i = 0; i < p.businesses.length; i++) {
+            const business = p.businesses[i];
+            const now = Date.now();
+            const lastPayout = business.lastPayout || p.joinDate; // Используем joinDate если lastPayout еще не установлен
 
-    if (now - lastPayout >= 3600000) { // Если прошел час (3600000 мс)
-    const hoursPassed = Math.floor((now - lastPayout) / 3600000);
-    const profitEarned = business.profit * hoursPassed;
-    p.balance += profitEarned;
-    business.lastPayout = lastPayout + (hoursPassed * 3600000); // Обновляем время последней выплаты
-    addBotMessage(`<p>🏢 Бизнес "${business.name}" принес ${formatCurrency(profitEarned)} за ${hoursPassed} ч.</p>`);
-    await savePlayerState();
-}
-}
-}
+            if (now - lastPayout >= 3600000) { // Если прошел час (3600000 мс)
+                const hoursPassed = Math.floor((now - lastPayout) / 3600000);
+                const profitEarned = business.profit * hoursPassed;
+                p.balance += profitEarned;
+                business.lastPayout = lastPayout + (hoursPassed * 3600000); // Обновляем время последней выплаты
+                addBotMessage(`<p>🏢 Бизнес "${business.name}" принес ${formatCurrency(profitEarned)} за ${hoursPassed} ч.</p>`);
+                await savePlayerState();
+            }
+        }
+    }
 
 
     function checkLevelUp() {
-    const p = gameState.player;
-    const xpForNext = getXpForNextLevel(p.level);
-    if (p.xp >= xpForNext) {
-    p.level++;
-    p.xp -= xpForNext; // Оставляем остаток опыта на следующий уровень
-    p.balance += 100000 * p.level; // Бонус за уровень
-    p.businessSlots++; // Дополнительный слот бизнеса
-    addBotMessage(`<p class="text-green-400">🎉 Поздравляем! Вы достигли уровня ${p.level}! Вы получили ${formatCurrency(100000 * p.level)} и новый слот для бизнеса!</p>`);
-    // Рекурсивный вызов на случай, если опыта хватило на несколько уровней
-    checkLevelUp();
-}
-}
+        const p = gameState.player;
+        const xpForNext = getXpForNextLevel(p.level);
+        if (p.xp >= xpForNext) {
+            p.level++;
+            p.xp -= xpForNext; // Оставляем остаток опыта на следующий уровень
+            p.balance += 100000 * p.level; // Бонус за уровень
+            p.businessSlots++; // Дополнительный слот бизнеса
+            addBotMessage(`<p class="text-green-400">🎉 Поздравляем! Вы достигли уровня ${p.level}! Вы получили ${formatCurrency(100000 * p.level)} и новый слот для бизнеса!</p>`);
+            // Рекурсивный вызов на случай, если опыта хватило на несколько уровней
+            checkLevelUp();
+        }
+    }
 
     function showInitialProfile() {
-    const p = gameState.player;
-    const daysInGame = getDaysInGame(p.joinDate);
-    addBotMessage(`
+        const p = gameState.player;
+        const daysInGame = getDaysInGame(p.joinDate);
+        addBotMessage(`
             <p><b>${p.name}, ваш профиль:</b></p>
             <hr class="border-gray-600 my-1">
             <p>💰 Баланс: ${formatCurrency(p.balance)}</p>
@@ -488,523 +488,520 @@
             <p>💼 Бизнесы: ${p.businesses.length}/${p.businessSlots}</p>
             <p>📅 Дней в игре: ${daysInGame}</p>
         `, true);
-    showView('profile');
-}
+        showView('profile');
+    }
 
     function showLevels() {
-    const p = gameState.player;
-    let msg = `<p><b>⭐ Ваша прокачка:</b></p><hr class="border-gray-600 my-1">
+        const p = gameState.player;
+        let msg = `<p><b>⭐ Ваша прокачка:</b></p><hr class="border-gray-600 my-1">
                    <p>Текущий уровень: ${p.level}</p>
                    <p>Опыт: ${p.xp}/${getXpForNextLevel(p.level)}</p>
                    <p>Следующий уровень: ${p.level + 1}</p>`;
-    addBotMessage(msg, true);
-    showView('profile');
-}
+        addBotMessage(msg, true);
+        showView('profile');
+    }
 
     function showBusinesses() {
-    const p = gameState.player;
-    let msg = `<p><b>🏢 Ваши бизнесы (${p.businesses.length}/${p.businessSlots}):</b></p><hr class="border-gray-600 my-1">`;
-    if (p.businesses.length === 0) {
-    msg += "<p>У вас пока нет бизнесов.</p>";
-} else {
-    p.businesses.forEach(b => {
-    msg += `<p>- ${b.name} (Прибыль: ${formatCurrency(b.profit)}/ч.)</p>`;
-});
-}
-    addBotMessage(msg, true);
-    showView('profile');
-}
+        const p = gameState.player;
+        let msg = `<p><b>🏢 Ваши бизнесы (${p.businesses.length}/${p.businessSlots}):</b></p><hr class="border-gray-600 my-1">`;
+        if (p.businesses.length === 0) {
+            msg += "<p>У вас пока нет бизнесов.</p>";
+        } else {
+            p.businesses.forEach(b => {
+                msg += `<p>- ${b.name} (Прибыль: ${formatCurrency(b.profit)}/ч.)</p>`;
+            });
+        }
+        addBotMessage(msg, true);
+        showView('profile');
+    }
 
     function showMarketBusinesses() {
-    let msg = '<p><b>📈 Бизнесы на продажу:</b></p><hr class="border-gray-600 my-1">';
-    const buttons = [];
-    config.businessesForSale.forEach(b => {
-    msg += `<p>🏢 ${b.name}<br>Цена: ${formatCurrency(b.price)}<br>Прибыль: ${formatCurrency(b.profit)}/ч.</p><hr class="border-gray-600 my-1">`;
-    buttons.push({ label: `Купить "${b.name}"`, command: `biz_buy ${b.id}` });
-});
-    buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
-    addBotMessage(msg, true);
-    renderKeyboard(buttons);
-}
+        let msg = '<p><b>📈 Бизнесы на продажу:</b></p><hr class="border-gray-600 my-1">';
+        const buttons = [];
+        config.businessesForSale.forEach(b => {
+            msg += `<p>🏢 ${b.name}<br>Цена: ${formatCurrency(b.price)}<br>Прибыль: ${formatCurrency(b.profit)}/ч.</p><hr class="border-gray-600 my-1">`;
+            buttons.push({ label: `Купить "${b.name}"`, command: `biz_buy ${b.id}` });
+        });
+        buttons.push({ label: '↩️ Назад', command: 'back', isNav: true });
+        addBotMessage(msg, true);
+        renderKeyboard(buttons);
+    }
 
     async function buyBusiness(businessId) {
-    const business = config.businessesForSale.find(b => b.id === businessId);
-    if (!business) { addBotMessage("<p>❌ Такой бизнес не найден.</p>"); return; }
+        const business = config.businessesForSale.find(b => b.id === businessId);
+        if (!business) { addBotMessage("<p>❌ Такой бизнес не найден.</p>"); return; }
 
-    const p = gameState.player;
-    if (p.businesses.length >= p.businessSlots) {
-    addBotMessage("<p>❌ У вас нет свободных слотов для бизнеса. Повысьте уровень, чтобы получить больше слотов.</p>");
-    return;
-}
-    if (p.balance < business.price) {
-    addBotMessage("<p>❌ Недостаточно средств для покупки этого бизнеса.</p>");
-    return;
-}
+        const p = gameState.player;
+        if (p.businesses.length >= p.businessSlots) {
+            addBotMessage("<p>❌ У вас нет свободных слотов для бизнеса. Повысьте уровень, чтобы получить больше слотов.</p>");
+            return;
+        }
+        if (p.balance < business.price) {
+            addBotMessage("<p>❌ Недостаточно средств для покупки этого бизнеса.</p>");
+            return;
+        }
 
-    p.balance -= business.price;
-    p.businesses.push({ ...business, lastPayout: Date.now() }); // Добавляем lastPayout при покупке
-    addBotMessage(`<p>✅ Вы купили бизнес "${business.name}" за ${formatCurrency(business.price)}!</p>`);
-    await savePlayerState();
-    showView('market');
-}
+        p.balance -= business.price;
+        p.businesses.push({ ...business, lastPayout: Date.now() }); // Добавляем lastPayout при покупке
+        addBotMessage(`<p>✅ Вы купили бизнес "${business.name}" за ${formatCurrency(business.price)}!</p>`);
+        await savePlayerState();
+        showView('market');
+    }
 
     function activateMining() {
-    const p = gameState.player;
-    if (p.mining && p.mining.active) {
-    addBotMessage("<p>⛏️ Майнинг уже активен!</p>");
-    return;
-}
-    p.mining = {
-    active: true,
-    lastMined: Date.now(),
-    level: 1,
-    speed: 0.0001, // начальная скорость добычи BTC
-    interval: 10000 // 10 секунд на 0.0001 BTC
-};
-    addBotMessage("<p>⛏️ Майнинг активирован! Вы будете получать 0.0001 BTC каждые 10 секунд.</p>");
-    savePlayerState();
-    showView('mining');
-}
+        const p = gameState.player;
+        if (p.mining && p.mining.active) {
+            addBotMessage("<p>⛏️ Майнинг уже активен!</p>");
+            return;
+        }
+        p.mining = {
+            active: true,
+            lastMined: Date.now(),
+            level: 1,
+            speed: 0.0001, // начальная скорость добычи BTC
+            interval: 10000 // 10 секунд на 0.0001 BTC
+        };
+        addBotMessage("<p>⛏️ Майнинг активирован! Вы будете получать 0.0001 BTC каждые 10 секунд.</p>");
+        savePlayerState();
+        showView('mining');
+    }
 
     async function upgradeMiningPrompt() {
-    const p = gameState.player;
-    const upgradeCost = (p.mining ? p.mining.level : 0) * 500000 + 100000; // Примерная стоимость улучшения
-    if (p.balance < upgradeCost) {
-    addBotMessage(`<p>❌ Для улучшения майнера требуется ${formatCurrency(upgradeCost)}. У вас ${formatCurrency(p.balance)}.</p>`);
-    showView('mining');
-    return;
-}
-    renderInput(`Введите "да", чтобы улучшить майнер за ${formatCurrency(upgradeCost)}:`, 'mining_upgrade_execute');
-}
+        const p = gameState.player;
+        const upgradeCost = (p.mining ? p.mining.level : 0) * 500000 + 100000; // Примерная стоимость улучшения
+        if (p.balance < upgradeCost) {
+            addBotMessage(`<p>❌ Для улучшения майнера требуется ${formatCurrency(upgradeCost)}. У вас ${formatCurrency(p.balance)}.</p>`);
+            showView('mining');
+            return;
+        }
+        renderInput(`Введите "да", чтобы улучшить майнер за ${formatCurrency(upgradeCost)}:`, 'mining_upgrade_execute');
+    }
 
     async function upgradeMiningExecute(input) {
-    if (input.toLowerCase() !== 'да') {
-    addBotMessage("<p>Отмена улучшения майнера.</p>");
-    showView('mining');
-    return;
-}
-    const p = gameState.player;
-    const upgradeCost = (p.mining ? p.mining.level : 0) * 500000 + 100000;
-    if (p.balance < upgradeCost) { // Повторная проверка на всякий случай
-    addBotMessage("<p>❌ Недостаточно средств для улучшения майнера.</p>");
-    showView('mining');
-    return;
-}
-    p.balance -= upgradeCost;
-    p.mining.level++;
-    p.mining.speed += 0.0001; // Увеличиваем скорость добычи
-    p.mining.interval = Math.max(1000, p.mining.interval - 1000); // Уменьшаем интервал, но не ниже 1 секунды
-    addBotMessage(`<p>✅ Ваш майнер улучшен до уровня ${p.mining.level}! Скорость: ${formatBTC(p.mining.speed)} каждые ${p.mining.interval / 1000} сек.</p>`);
-    await savePlayerState();
-    showView('mining');
-}
+        if (input.toLowerCase() !== 'да') {
+            addBotMessage("<p>Отмена улучшения майнера.</p>");
+            showView('mining');
+            return;
+        }
+        const p = gameState.player;
+        const upgradeCost = (p.mining ? p.mining.level : 0) * 500000 + 100000;
+        if (p.balance < upgradeCost) { // Повторная проверка на всякий случай
+            addBotMessage("<p>❌ Недостаточно средств для улучшения майнера.</p>");
+            showView('mining');
+            return;
+        }
+        p.balance -= upgradeCost;
+        p.mining.level++;
+        p.mining.speed += 0.0001; // Увеличиваем скорость добычи
+        p.mining.interval = Math.max(1000, p.mining.interval - 1000); // Уменьшаем интервал, но не ниже 1 секунды
+        addBotMessage(`<p>✅ Ваш майнер улучшен до уровня ${p.mining.level}! Скорость: ${formatBTC(p.mining.speed)} каждые ${p.mining.interval / 1000} сек.</p>`);
+        await savePlayerState();
+        showView('mining');
+    }
 
     async function claimMinedBtc() {
-    const p = gameState.player;
-    if (!p.mining || !p.mining.active || p.bitcoin === 0) {
-    addBotMessage("<p>❌ У вас нет намайненных BTC для вывода.</p>");
-    return;
-}
-    const amount = p.bitcoin;
-    // Используем 50,000,000 в качестве фиксированного курса BTC к USD, как было указано ранее
-    const btcToUsdRate = 50000000;
-    p.balance += amount * btcToUsdRate;
-    p.bitcoin = 0;
-    addBotMessage(`<p>✅ Вы успешно продали ${formatBTC(amount)} за ${formatCurrency(amount * btcToUsdRate)}!</p>`);
-    await savePlayerState();
-    showView('mining');
-}
+        const p = gameState.player;
+        if (!p.mining || !p.mining.active || p.bitcoin === 0) {
+            addBotMessage("<p>❌ У вас нет намайненных BTC для вывода.</p>");
+            return;
+        }
+        const amount = p.bitcoin;
+        // Используем 50,000,000 в качестве фиксированного курса BTC к USD, как было указано ранее
+        const btcToUsdRate = 50000000;
+        p.balance += amount * btcToUsdRate;
+        p.bitcoin = 0;
+        addBotMessage(`<p>✅ Вы успешно продали ${formatBTC(amount)} за ${formatCurrency(amount * btcToUsdRate)}!</p>`);
+        await savePlayerState();
+        showView('mining');
+    }
 
     async function sellBtcPrompt() {
-    const p = gameState.player;
-    if (p.bitcoin === 0) {
-    addBotMessage("<p>❌ У вас нет BTC для продажи.</p>");
-    showView('mining');
-    return;
-}
-    renderInput(`Сколько BTC вы хотите продать? (У вас ${formatBTC(p.bitcoin)})`, 'sell_btc_execute');
-}
+        const p = gameState.player;
+        if (p.bitcoin === 0) {
+            addBotMessage("<p>❌ У вас нет BTC для продажи.</p>");
+            showView('mining');
+            return;
+        }
+        renderInput(`Сколько BTC вы хотите продать? (У вас ${formatBTC(p.bitcoin)})`, 'sell_btc_execute');
+    }
 
     async function sellBtcExecute(input) {
-    const amount = parseFloat(input);
-    const p = gameState.player;
-    if (isNaN(amount) || amount <= 0 || amount > p.bitcoin) {
-    addBotMessage("<p>❌ Некорректное количество BTC для продажи.</p>");
-    showView('mining');
-    return;
-}
-    p.bitcoin -= amount;
-    // Используем 50,000,000 в качестве фиксированного курса BTC к USD
-    const btcToUsdRate = 50000000;
-    p.balance += amount * btcToUsdRate;
-    addBotMessage(`<p>✅ Вы продали ${formatBTC(amount)} за ${formatCurrency(amount * btcToUsdRate)}!</p>`);
-    await savePlayerState();
-    showView('mining');
-}
+        const amount = parseFloat(input);
+        const p = gameState.player;
+        if (isNaN(amount) || amount <= 0 || amount > p.bitcoin) {
+            addBotMessage("<p>❌ Некорректное количество BTC для продажи.</p>");
+            showView('mining');
+            return;
+        }
+        p.bitcoin -= amount;
+        // Используем 50,000,000 в качестве фиксированного курса BTC к USD
+        const btcToUsdRate = 50000000;
+        p.balance += amount * btcToUsdRate;
+        addBotMessage(`<p>✅ Вы продали ${formatBTC(amount)} за ${formatCurrency(amount * btcToUsdRate)}!</p>`);
+        await savePlayerState();
+        showView('mining');
+    }
 
     async function claimPension() {
-    const p = gameState.player;
-    const daysInGame = getDaysInGame(p.joinDate);
-    // Пенсия раз в 7 дней
-    const nextPensionTime = (p.lastPensionClaim || p.joinDate) + (7 * 24 * 60 * 60 * 1000);
-    if (Date.now() < nextPensionTime) {
-    const timeLeft = nextPensionTime - Date.now();
-    addBotMessage(`<p>⏳ Вы сможете забрать пенсию через ${formatTime(timeLeft)}.</p>`);
-    return;
-}
-    const pensionAmount = p.level * 10000; // Пример: 10000$ за каждый уровень
-    p.balance += pensionAmount;
-    p.lastPensionClaim = Date.now();
-    addBotMessage(`<p>👴 Вы получили пенсию в размере ${formatCurrency(pensionAmount)}!</p>`);
-    await savePlayerState();
-    showView('bank');
-}
+        const p = gameState.player;
+        const daysInGame = getDaysInGame(p.joinDate);
+        // Пенсия раз в 7 дней
+        const nextPensionTime = (p.lastPensionClaim || p.joinDate) + (7 * 24 * 60 * 60 * 1000);
+        if (Date.now() < nextPensionTime) {
+            const timeLeft = nextPensionTime - Date.now();
+            addBotMessage(`<p>⏳ Вы сможете забрать пенсию через ${formatTime(timeLeft)}.</p>`);
+            return;
+        }
+        const pensionAmount = p.level * 10000; // Пример: 10000$ за каждый уровень
+        p.balance += pensionAmount;
+        p.lastPensionClaim = Date.now();
+        addBotMessage(`<p>👴 Вы получили пенсию в размере ${formatCurrency(pensionAmount)}!</p>`);
+        await savePlayerState();
+        showView('bank');
+    }
 
     async function claimBonus() {
-    const p = gameState.player;
-    const now = Date.now();
-    const todayStart = new Date().setHours(0, 0, 0, 0); // Начало текущего дня
+        const p = gameState.player;
+        const now = Date.now();
+        const todayStart = new Date().setHours(0, 0, 0, 0); // Начало текущего дня
 
-    // Проверяем, был ли бонус уже забран сегодня
-    if (p.lastBonusClaim && new Date(p.lastBonusClaim).setHours(0, 0, 0, 0) === todayStart) {
-    addBotMessage("<p>❌ Вы уже получили ежедневный бонус сегодня. Возвращайтесь завтра!</p>");
-    return;
-}
+        // Проверяем, был ли бонус уже забран сегодня
+        if (p.lastBonusClaim && new Date(p.lastBonusClaim).setHours(0, 0, 0, 0) === todayStart) {
+            addBotMessage("<p>❌ Вы уже получили ежедневный бонус сегодня. Возвращайтесь завтра!</p>");
+            return;
+        }
 
-    // Проверяем, была ли серия прервана (если последний бонус был не вчера)
-    if (p.lastBonusClaim && new Date(p.lastBonusClaim).setHours(0, 0, 0, 0) !== (todayStart - 24 * 60 * 60 * 1000)) {
-    p.bonusStreak = 0; // Сбрасываем серию, если не было вчерашнего бонуса
-}
+        // Проверяем, была ли серия прервана (если последний бонус был не вчера)
+        if (p.lastBonusClaim && new Date(p.lastBonusClaim).setHours(0, 0, 0, 0) !== (todayStart - 24 * 60 * 60 * 1000)) {
+            p.bonusStreak = 0; // Сбрасываем серию, если не было вчерашнего бонуса
+        }
 
-    p.bonusStreak = (p.bonusStreak || 0) + 1; // Увеличиваем серию
-    const bonusAmount = 10000 + (p.bonusStreak - 1) * 5000; // Базовый + за серию
-    p.balance += bonusAmount;
-    p.lastBonusClaim = now; // Обновляем время последнего бонуса
+        p.bonusStreak = (p.bonusStreak || 0) + 1; // Увеличиваем серию
+        const bonusAmount = 10000 + (p.bonusStreak - 1) * 5000; // Базовый + за серию
+        p.balance += bonusAmount;
+        p.lastBonusClaim = now; // Обновляем время последнего бонуса
 
-    addBotMessage(`<p>🎁 Вы получили ежедневный бонус: ${formatCurrency(bonusAmount)}! Серия: ${p.bonusStreak} дней.</p>`);
-    await savePlayerState();
-    showView('main');
-}
+        addBotMessage(`<p>🎁 Вы получили ежедневный бонус: ${formatCurrency(bonusAmount)}! Серия: ${p.bonusStreak} дней.</p>`);
+        await savePlayerState();
+        showView('main');
+    }
 
 
     async function createDepositPrompt() {
-    renderInput("Введите сумму для вклада (мин. 10000, макс. 100000000):", 'create_deposit_execute');
-}
+        renderInput("Введите сумму для вклада (мин. 10000, макс. 100000000):", 'create_deposit_execute');
+    }
 
     async function createDeposit(amountStr) {
-    const amount = parseAmount(amountStr);
-    const p = gameState.player;
+        const amount = parseAmount(amountStr);
+        const p = gameState.player;
 
-    if (isNaN(amount) || amount < 10000 || amount > 100000000) {
-    addBotMessage("<p>❌ Некорректная сумма для вклада. Введите число от 10000 до 100000000.</p>");
-    showView('deposits');
-    return;
-}
-    if (p.balance < amount) {
-    addBotMessage("<p>❌ Недостаточно средств для создания вклада.</p>");
-    showView('deposits');
-    return;
-}
+        if (isNaN(amount) || amount < 10000 || amount > 100000000) {
+            addBotMessage("<p>❌ Некорректная сумма для вклада. Введите число от 10000 до 100000000.</p>");
+            showView('deposits');
+            return;
+        }
+        if (p.balance < amount) {
+            addBotMessage("<p>❌ Недостаточно средств для создания вклада.</p>");
+            showView('deposits');
+            return;
+        }
 
-    const durationDays = 7; // Пример: вклад на 7 дней
-    const rate = 0.05; // 5% годовых, для 7 дней будет меньше
+        const durationDays = 7; // Пример: вклад на 7 дней
+        const rate = 0.05; // 5% годовых, для 7 дней будет меньше
 
-    p.balance -= amount;
-    p.deposits.push({
-    amount: amount,
-    startTime: Date.now(),
-    payoutTime: Date.now() + (durationDays * 24 * 60 * 60 * 1000),
-    rate: rate,
-    claimed: false
-});
-    addBotMessage(`<p>✅ Вы открыли вклад на ${formatCurrency(amount)} под ${rate * 100}% годовых. Выплата через ${durationDays} дней.</p>`);
-    await savePlayerState();
-    showView('deposits');
-}
+        p.balance -= amount;
+        p.deposits.push({
+            amount: amount,
+            startTime: Date.now(),
+            payoutTime: Date.now() + (durationDays * 24 * 60 * 60 * 1000),
+            rate: rate,
+            claimed: false
+        });
+        addBotMessage(`<p>✅ Вы открыли вклад на ${formatCurrency(amount)} под ${rate * 100}% годовых. Выплата через ${durationDays} дней.</p>`);
+        await savePlayerState();
+        showView('deposits');
+    }
 
     function showInventory() {
-    const p = gameState.player;
-    let msg = `<p><b>📦 Ваш инвентарь:</b></p><hr class="border-gray-600 my-1">`;
-    if (!p.inventory || p.inventory.length === 0) {
-    msg += "<p>Инвентарь пуст.</p>";
-} else {
-    p.inventory.forEach(item => {
-    msg += `<p>${item.icon} ${item.name} (${item.quantity})</p>`;
-});
-}
-    addBotMessage(msg, true);
-    showView('inventory');
-}
+        const p = gameState.player;
+        let msg = `<p><b>📦 Ваш инвентарь:</b></p><hr class="border-gray-600 my-1">`;
+        if (!p.inventory || p.inventory.length === 0) {
+            msg += "<p>Инвентарь пуст.</p>";
+        } else {
+            p.inventory.forEach(item => {
+                msg += `<p>${item.icon} ${item.name} (${item.quantity})</p>`;
+            });
+        }
+        addBotMessage(msg, true);
+        showView('inventory');
+    }
 
     async function showItemManagement(itemId) {
-    const item = gameState.player.inventory.find(i => i.id === itemId);
-    if (!item) {
-    addBotMessage("<p>❌ Предмет не найден в инвентаре.</p>");
-    showView('inventory');
-    return;
-}
-    gameState.currentManagedItemId = itemId; // Сохраняем ID управляемого предмета
-    addBotMessage(`<p><b>Управление предметом:</b> ${item.name} (Кол-во: ${item.quantity})</p>`, true);
-    showView('item_management');
-}
+        const item = gameState.player.inventory.find(i => i.id === itemId);
+        if (!item) {
+            addBotMessage("<p>❌ Предмет не найден в инвентаре.</p>");
+            showView('inventory');
+            return;
+        }
+        gameState.currentManagedItemId = itemId; // Сохраняем ID управляемого предмета
+        addBotMessage(`<p><b>Управление предметом:</b> ${item.name} (Кол-во: ${item.quantity})</p>`, true);
+        showView('item_management');
+    }
 
     async function openCase(caseId, count) {
-    const p = gameState.player;
-    const caseItem = p.inventory.find(item => item.id === caseId && item.type === 'case');
-    const numToOpen = parseInt(count);
+        const p = gameState.player;
+        const caseItem = p.inventory.find(item => item.id === caseId && item.type === 'case');
+        const numToOpen = parseInt(count);
 
-    if (!caseItem || caseItem.quantity < numToOpen || numToOpen <= 0) {
-    addBotMessage("<p>❌ Недостаточно кейсов или некорректное количество для открытия.</p>");
-    showView('item_management');
-    return;
-}
+        if (!caseItem || caseItem.quantity < numToOpen || numToOpen <= 0) {
+            addBotMessage("<p>❌ Недостаточно кейсов или некорректное количество для открытия.</p>");
+            showView('item_management');
+            return;
+        }
 
-    const caseConfig = config.cases[caseId];
-    if (!caseConfig) {
-    addBotMessage("<p>❌ Информация о кейсе не найдена.</p>");
-    showView('item_management');
-    return;
-}
+        const caseConfig = config.cases[caseId];
+        if (!caseConfig) {
+            addBotMessage("<p>❌ Информация о кейсе не найдена.</p>");
+            showView('item_management');
+            return;
+        }
 
-    let totalLoot = 0;
-    for (let i = 0; i < numToOpen; i++) {
-    const loot = caseConfig.possibleLoot[Math.floor(Math.random() * caseConfig.possibleLoot.length)];
-    totalLoot += loot;
-}
+        let totalLoot = 0;
+        for (let i = 0; i < numToOpen; i++) {
+            // FIX: Исправлена опечатка 'possibleLoot' на 'caseConfig.possibleLoot'
+            const loot = caseConfig.possibleLoot[Math.floor(Math.random() * caseConfig.possibleLoot.length)];
+            totalLoot += loot;
+        }
 
-    p.balance += totalLoot;
-    caseItem.quantity -= numToOpen;
+        p.balance += totalLoot;
+        caseItem.quantity -= numToOpen;
 
-    if (caseItem.quantity <= 0) {
-    p.inventory = p.inventory.filter(item => item.id !== caseId);
-}
+        if (caseItem.quantity <= 0) {
+            p.inventory = p.inventory.filter(item => item.id !== caseId);
+        }
 
-    addBotMessage(`<p>✅ Вы открыли ${numToOpen} "${caseConfig.name}" и получили ${formatCurrency(totalLoot)}!</p>`);
-    await savePlayerState();
-    showView('inventory'); // Обновляем инвентарь после открытия
-}
+        addBotMessage(`<p>✅ Вы открыли ${numToOpen} "${caseConfig.name}" и получили ${formatCurrency(totalLoot)}!</p>`);
+        await savePlayerState();
+        showView('inventory'); // Обновляем инвентарь после открытия
+    }
 
     function showShop() {
-    let msg = '<p><b>🛍️ Магазин:</b></p><hr class="border-gray-600 my-1">';
-    for (const key in config.donationCases) {
-    const item = config.donationCases[key];
-    msg += `<p>${item.icon} <b>${item.name}</b><br>Цена: ${item.price} голосов VK</p>`;
-    if (item.content.balance) msg += `<p>   Награда: ${formatCurrency(item.content.balance)}</p>`;
-    if (item.content.bitcoin) msg += `<p>   Награда: ${formatBTC(item.content.bitcoin)}</p>`;
-    if (item.content.euro) msg += `<p>   Награда: ${formatEuro(item.content.euro)}</p>`;
-    if (item.content.items && item.content.items.length > 0) {
-    item.content.items.forEach(cItem => {
-    msg += `<p>   Награда: ${cItem.quantity}x ${cItem.icon} ${cItem.name}</p>`;
-});
-}
-    msg += `<hr class="border-gray-600 my-1">`;
-}
-    addBotMessage(msg, true);
-    showView('shop');
-}
+        let msg = '<p><b>🛍️ Магазин:</b></p><hr class="border-gray-600 my-1">';
+        for (const key in config.donationCases) {
+            const item = config.donationCases[key];
+            msg += `<p>${item.icon} <b>${item.name}</b><br>Цена: ${item.price} голосов VK</p>`;
+            if (item.content.balance) msg += `<p>   Награда: ${formatCurrency(item.content.balance)}</p>`;
+            if (item.content.bitcoin) msg += `<p>   Награда: ${formatBTC(item.content.bitcoin)}</p>`;
+            if (item.content.euro) msg += `<p>   Награда: ${formatEuro(item.content.euro)}</p>`;
+            if (item.content.items && item.content.items.length > 0) {
+                item.content.items.forEach(cItem => {
+                    msg += `<p>   Награда: ${cItem.quantity}x ${cItem.icon} ${cItem.name}</p>`;
+                });
+            }
+            msg += `<hr class="border-gray-600 my-1">`;
+        }
+        addBotMessage(msg, true);
+        showView('shop');
+    }
 
     async function initiatePayment(productId) {
-    const product = config.donationCases[productId];
-    if (!product) {
-    addBotMessage("<p>❌ Товар не найден.</p>");
-    return;
-}
+        const product = config.donationCases[productId];
+        if (!product) {
+            addBotMessage("<p>❌ Товар не найден.</p>");
+            return;
+        }
 
-    try {
-    const response = await vkBridge.send('VKWebAppOpenPayForm', {
-    app_id: appId,
-    action: 'pay-to-group',
-    params: {
-    amount: product.price,
-    description: product.name,
-    data: JSON.stringify({ userId: userId, productId: productId }) // Дополнительные данные для обработки на сервере
-}
-});
+        try {
+            const response = await vkBridge.send('VKWebAppOpenPayForm', {
+                app_id: appId,
+                action: 'pay-to-group',
+                params: {
+                    amount: product.price,
+                    description: product.name,
+                    data: JSON.stringify({ userId: userId, productId: productId }) // Дополнительные данные для обработки на сервере
+                }
+            });
 
-    if (response.status === 'success') {
-    addBotMessage(`<p>✅ Оплата за "${product.name}" успешно произведена!</p>`);
-    // Начисляем награды игроку
-    const p = gameState.player;
-    if (product.content.balance) p.balance += product.content.balance;
-    if (product.content.bitcoin) p.bitcoin += product.content.bitcoin;
-    if (product.content.euro) p.euro += product.content.euro;
+            if (response.status === 'success') {
+                addBotMessage(`<p>✅ Оплата за "${product.name}" успешно произведена!</p>`);
+                // Начисляем награды игроку
+                const p = gameState.player;
+                if (product.content.balance) p.balance += product.content.balance;
+                if (product.content.bitcoin) p.bitcoin += product.content.bitcoin;
+                if (product.content.euro) p.euro += product.content.euro;
 
-    if (product.content.items) {
-    product.content.items.forEach(newItem => {
-    const existingItem = p.inventory.find(item => item.id === newItem.id && item.type === newItem.type);
-    if (existingItem) {
-    existingItem.quantity += newItem.quantity;
-} else {
-    p.inventory.push({ ...newItem });
-}
-});
-}
-    await savePlayerState();
-} else {
-    addBotMessage("<p>❌ Оплата отменена или не удалась. Попробуйте еще раз.</p>");
-}
-} catch (error) {
-    console.error("Ошибка при инициировании платежа VK Pay:", error);
-    addBotMessage("<p class='text-red-400'>⚠️ Произошла ошибка при обработке платежа. Пожалуйста, попробуйте еще раз или свяжитесь с поддержкой.</p>");
-}
-    showView('shop');
-}
+                if (product.content.items) {
+                    product.content.items.forEach(newItem => {
+                        // Здесь вызывается addItemToInventory, которая теперь глобально доступна
+                        addItemToInventory(newItem);
+                    });
+                }
+                await savePlayerState();
+            } else {
+                addBotMessage("<p>❌ Оплата отменена или не удалась. Попробуйте еще раз.</p>");
+            }
+        } catch (error) {
+            console.error("Ошибка при инициировании платежа VK Pay:", error);
+            addBotMessage("<p class='text-red-400'>⚠️ Произошла ошибка при обработке платежа. Пожалуйста, попробуйте еще раз или свяжитесь с поддержкой.</p>");
+        }
+        showView('shop');
+    }
 
     async function createPromoPrompt() {
-    renderInput("Введите сумму валюты для промокода (Например: 100000):", 'promo_currency_create');
-}
+        renderInput("Введите сумму валюты для промокода (Например: 100000):", 'promo_currency_create');
+    }
 
     async function createPromoCurrency(amountStr) {
-    const amount = parseAmount(amountStr);
-    const p = gameState.player;
+        const amount = parseAmount(amountStr);
+        const p = gameState.player;
 
-    if (isNaN(amount) || amount <= 0) {
-    addBotMessage("<p>❌ Некорректная сумма для промокода.</p>");
-    showView('promo');
-    return;
-}
-    if (p.balance < amount * 2) { // Стоимость создания промокода, например, 2x от суммы
-    addBotMessage("<p>❌ Недостаточно средств для создания такого промокода (стоимость: " + formatCurrency(amount * 2) + ").</p>");
-    showView('promo');
-    return;
-}
+        if (isNaN(amount) || amount <= 0) {
+            addBotMessage("<p>❌ Некорректная сумма для промокода.</p>");
+            showView('promo');
+            return;
+        }
+        if (p.balance < amount * 2) { // Стоимость создания промокода, например, 2x от суммы
+            addBotMessage("<p>❌ Недостаточно средств для создания такого промокода (стоимость: " + formatCurrency(amount * 2) + ").</p>");
+            showView('promo');
+            return;
+        }
 
-    const promoCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Генерируем случайный код
-    p.balance -= amount * 2;
+        const promoCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Генерируем случайный код
+        p.balance -= amount * 2;
 
-    // В реальном приложении промокоды должны храниться в базе данных на сервере
-    // Для примера храним их в gameState (небезопасно для прод)
-    if (!gameState.promocodes) gameState.promocodes = {};
-    gameState.promocodes[promoCode] = { type: 'currency', value: amount, usedBy: [] };
+        // В реальном приложении промокоды должны храниться в базе данных на сервере
+        // Для примера храним их в gameState (небезопасно для прод)
+        if (!gameState.promocodes) gameState.promocodes = {};
+        gameState.promocodes[promoCode] = { type: 'currency', value: amount, usedBy: [] };
 
-    addBotMessage(`<p>✅ Промокод "${promoCode}" на ${formatCurrency(amount)} создан! Поделитесь им.</p>`);
-    await savePlayerState();
-    showView('promo');
-}
+        addBotMessage(`<p>✅ Промокод "${promoCode}" на ${formatCurrency(amount)} создан! Поделитесь им.</p>`);
+        await savePlayerState();
+        showView('promo');
+    }
 
     async function activatePromoPrompt() {
-    renderInput("Введите промокод:", 'promo_activate_execute');
-}
+        renderInput("Введите промокод:", 'promo_activate_execute');
+    }
 
     async function activatePromoExecute(promoCode) {
-    promoCode = promoCode.toUpperCase();
-    const p = gameState.player;
+        promoCode = promoCode.toUpperCase();
+        const p = gameState.player;
 
-    if (!gameState.promocodes || !gameState.promocodes[promoCode]) {
-    addBotMessage("<p>❌ Промокод не найден.</p>");
-    showView('promo');
-    return;
-}
+        if (!gameState.promocodes || !gameState.promocodes[promoCode]) {
+            addBotMessage("<p>❌ Промокод не найден.</p>");
+            showView('promo');
+            return;
+        }
 
-    const promo = gameState.promocodes[promoCode];
-    if (promo.usedBy.includes(userId)) {
-    addBotMessage("<p>❌ Вы уже использовали этот промокод.</p>");
-    showView('promo');
-    return;
-}
+        const promo = gameState.promocodes[promoCode];
+        if (promo.usedBy.includes(userId)) {
+            addBotMessage("<p>❌ Вы уже использовали этот промокод.</p>");
+            showView('promo');
+            return;
+        }
 
-    if (promo.type === 'currency') {
-    p.balance += promo.value;
-    addBotMessage(`<p>✅ Промокод "${promoCode}" активирован! Вы получили ${formatCurrency(promo.value)}.</p>`);
-}
-    // Добавить другие типы промокодов здесь (кейсы, BTC и т.д.)
+        if (promo.type === 'currency') {
+            p.balance += promo.value;
+            addBotMessage(`<p>✅ Промокод "${promoCode}" активирован! Вы получили ${formatCurrency(promo.value)}.</p>`);
+        }
+        // Добавить другие типы промокодов здесь (кейсы, BTC и т.д.)
 
-    promo.usedBy.push(userId); // Отмечаем, что пользователь использовал промокод
-    await savePlayerState();
-    showView('promo');
-}
+        promo.usedBy.push(userId); // Отмечаем, что пользователь использовал промокод
+        await savePlayerState();
+        showView('promo');
+    }
 
     function manageBusiness(businessId) {
-    addBotMessage(`<p>Функционал управления бизнесом (ID: ${businessId}) в разработке. Скоро будет!</p>`);
-    showView('profile_businesses'); // Возвращаемся к списку бизнесов
-}
+        addBotMessage(`<p>Функционал управления бизнесом (ID: ${businessId}) в разработке. Скоро будет!</p>`);
+        showView('profile_businesses'); // Возвращаемся к списку бизнесов
+    }
 
     // --- ОБРАБОТЧИК КОМАНД ---
     window.sendCommand = async (command, label = '', isNavCommand = false) => {
-    // Показываем сообщение пользователя только для не-навигационных команд
-    if (!isNavCommand) {
-    addUserMessage(label);
-}
+        // Показываем сообщение пользователя только для не-навигационных команд
+        if (!isNavCommand) {
+            addUserMessage(label);
+        }
 
-    // Очищаем prompt, если это не команда submit_input
-    if (gameState.prompt && command.split(' ')[0] !== 'submit_input') {
-    gameState.prompt = null;
-}
+        // Очищаем prompt, если это не команда submit_input
+        if (gameState.prompt && command.split(' ')[0] !== 'submit_input') {
+            gameState.prompt = null;
+        }
 
-    const [cmd, ...args] = command.split(' ');
+        const [cmd, ...args] = command.split(' ');
 
-    // Задержка для имитации "думающего" бота
-    setTimeout(async () => {
-    const commandHandlers = {
-    'view_profile': showInitialProfile,
-    'view_work': () => { addBotMessage("<p>Выберите работу:</p>"); showView('work'); },
-    'view_bank': () => { addBotMessage("<p>Выберите банковскую операцию:</p>"); showView('bank'); },
-    'view_market': () => { addBotMessage("<p>Что вас интересует на рынке?</p>"); showView('market'); },
-    'view_shop': showShop,
-    'get_bonus': claimBonus,
-    'profile_stats': showInitialProfile,
-    'profile_levels': showLevels,
-    'profile_businesses': showBusinesses,
-    'profile_inventory': showInventory,
-    'view_mining': () => { addBotMessage("<p>Управление майнингом:</p>"); showView('mining'); },
-    'view_deposits': () => { addBotMessage("<p>Управление вкладами:</p>"); showView('deposits'); },
-    'bank_pension': claimPension,
-    'market_businesses': showMarketBusinesses,
-    'view_promo': () => { addBotMessage("<p>Управление промокодами:</p>"); showView('promo'); },
-    'back': goBack,
-    'back_to_main': backToMain,
+        // Задержка для имитации "думающего" бота
+        setTimeout(async () => {
+            const commandHandlers = {
+                'view_profile': showInitialProfile,
+                'view_work': () => { addBotMessage("<p>Выберите работу:</p>"); showView('work'); },
+                'view_bank': () => { addBotMessage("<p>Выберите банковскую операцию:</p>"); showView('bank'); },
+                'view_market': () => { addBotMessage("<p>Что вас интересует на рынке?</p>"); showView('market'); },
+                'view_shop': showShop,
+                'get_bonus': claimBonus,
+                'profile_stats': showInitialProfile,
+                'profile_levels': showLevels,
+                'profile_businesses': showBusinesses,
+                'profile_inventory': showInventory,
+                'view_mining': () => { addBotMessage("<p>Управление майнингом:</p>"); showView('mining'); },
+                'view_deposits': () => { addBotMessage("<p>Управление вкладами:</p>"); showView('deposits'); },
+                'bank_pension': claimPension,
+                'market_businesses': showMarketBusinesses,
+                'view_promo': () => { addBotMessage("<p>Управление промокодами:</p>"); showView('promo'); },
+                'back': goBack,
+                'back_to_main': backToMain,
 
-    'work_start': () => startWork(parseInt(args[0])),
-    'mining_activate': activateMining,
-    'mining_upgrade_prompt': upgradeMiningPrompt,
-    'mining_claim': claimMinedBtc,
-    'mining_sell_prompt': sellBtcPrompt,
-    'deposit_create_prompt': createDepositPrompt,
-    'shop_buy': () => initiatePayment(args[0]),
+                'work_start': () => startWork(parseInt(args[0])),
+                'mining_activate': activateMining,
+                'mining_upgrade_prompt': upgradeMiningPrompt,
+                'mining_claim': claimMinedBtc,
+                'mining_sell_prompt': sellBtcPrompt,
+                'deposit_create_prompt': createDepositPrompt,
+                'shop_buy': () => initiatePayment(args[0]),
 
-    // Специальные обработчики, которые вызываются после ввода
-    'create_deposit_execute': createDeposit, // Переименовано для ясности
-    'sell_btc_execute': sellBtcExecute,
-    'mining_upgrade_execute': upgradeMiningExecute,
-    'promo_currency_create': createPromoCurrency,
-    'promo_activate_execute': activatePromoExecute,
+                // Специальные обработчики, которые вызываются после ввода
+                'create_deposit_execute': createDeposit, // Переименовано для ясности
+                'sell_btc_execute': sellBtcExecute,
+                'mining_upgrade_execute': upgradeMiningExecute,
+                'promo_currency_create': createPromoCurrency,
+                'promo_activate_execute': activatePromoExecute,
 
-    // --- КОМАНДЫ ИЗ ВАШЕГО ОРИГИНАЛЬНОГО КОДА ---
-    'company_fire': () => { addBotMessage('<p>Вы уволились.</p>'); gameState.company = null; savePlayerState(); showView('company'); },
-    'company_join_execute': (companyId) => { addBotMessage(`<p>Попытка присоединиться к компании ${companyId}. (Функционал в разработке)</p>`); showView('company'); }, // Заглушка
-    'biz_manage': () => manageBusiness(parseInt(args[0])),
-    'biz_buy': () => buyBusiness(parseInt(args[0])),
-    'item_manage': () => showItemManagement(args[0]),
-    'case_open': () => openCase(args[0], args[1]),
-};
+                // --- КОМАНДЫ ИЗ ВАШЕГО ОРИГИНАЛЬНОГО КОДА ---
+                'company_fire': () => { addBotMessage('<p>Вы уволились.</p>'); gameState.company = null; savePlayerState(); showView('company'); },
+                'company_join_execute': (companyId) => { addBotMessage(`<p>Попытка присоединиться к компании ${companyId}. (Функционал в разработке)</p>`); showView('company'); }, // Заглушка
+                'biz_manage': () => manageBusiness(parseInt(args[0])),
+                'biz_buy': () => buyBusiness(parseInt(args[0])),
+                'item_manage': () => showItemManagement(args[0]),
+                'case_open': () => openCase(args[0], args[1]),
+            };
 
-    if (cmd === 'submit_input') {
-    const input = document.getElementById('text-input').value;
-    if (!input.trim()) return; // Не отправляем пустой ввод
+            if (cmd === 'submit_input') {
+                const input = document.getElementById('text-input').value;
+                if (!input.trim()) return; // Не отправляем пустой ввод
 
-    // Определяем, какой callback вызывать, основываясь на предыдущем запросе
-    if (gameState.prompt && typeof commandHandlers[gameState.prompt.prevView] === 'function') {
-    const callbackFunction = commandHandlers[gameState.prompt.prevView];
-    gameState.prompt = null; // Очищаем prompt перед вызовом
-    await callbackFunction(input); // Передаем введенный текст в функцию
-} else {
-    addBotMessage("<p>Неизвестный ввод или функция не определена для текущего запроса.</p>");
-}
-    renderKeyboard(); // Обновляем клавиатуру после ввода
-    return; // Выходим, чтобы избежать выполнения других обработчиков
-}
+                // Определяем, какой callback вызывать, основываясь на предыдущем запросе
+                if (gameState.prompt && typeof commandHandlers[gameState.prompt.prevView] === 'function') {
+                    const callbackFunction = commandHandlers[gameState.prompt.prevView];
+                    gameState.prompt = null; // Очищаем prompt перед вызовом
+                    await callbackFunction(input); // Передаем введенный текст в функцию
+                } else {
+                    addBotMessage("<p>Неизвестный ввод или функция не определена для текущего запроса.</p>");
+                }
+                renderKeyboard(); // Обновляем клавиатуру после ввода
+                return; // Выходим, чтобы избежать выполнения других обработчиков
+            }
 
-    if (commandHandlers[cmd]) {
-    await commandHandlers[cmd](...args); // Вызываем обработчик с аргументами
-} else if (!isNavCommand && label && typeof label === 'string' && label !== 'undefined') {
-    addBotMessage(`<p>Раздел «${label}» в разработке.</p>`);
-}
-}, 300);
-};
+            if (commandHandlers[cmd]) {
+                await commandHandlers[cmd](...args); // Вызываем обработчик с аргументами
+            } else if (!isNavCommand && label && typeof label === 'string' && label !== 'undefined') {
+                addBotMessage(`<p>Раздел «${label}» в разработке.</p>`);
+            }
+        }, 300);
+    };
 
     window.submitInput = () => {
-    window.sendCommand('submit_input', 'Отправка ввода'); // Передаем команду 'submit_input'
-};
+        window.sendCommand('submit_input', 'Отправка ввода'); // Передаем команду 'submit_input'
+    };
 
 
     // Привязка функций к window для вызова из HTML и других частей кода
@@ -1046,122 +1043,122 @@
     window.openCase = openCase;
     window.showShop = showShop;
     window.initiatePayment = initiatePayment;
-    window.addItemToInventory = addItemToInventory;
-    window.createPromoPrompt = createPromoPrompt; // Добавляем в window
-    window.createPromoCurrency = createPromoCurrency; // Добавляем в window
-    window.activatePromoPrompt = activatePromoPrompt; // Добавляем в window
-    window.activatePromoExecute = activatePromoExecute; // Добавляем в window
-    window.manageBusiness = manageBusiness; // Добавляем в window
+    window.addItemToInventory = addItemToInventory; // ***ДОБАВЛЕНО: Теперь addItemToInventory глобально доступна***
+    window.createPromoPrompt = createPromoPrompt;
+    window.createPromoCurrency = createPromoCurrency;
+    window.activatePromoPrompt = activatePromoPrompt;
+    window.activatePromoExecute = activatePromoExecute;
+    window.manageBusiness = manageBusiness;
 
     // --- Инициализация игры ---
     document.addEventListener('DOMContentLoaded', async () => {
-    console.clear(); // Очищаем консоль для чистого старта
-    // Инициализация Firebase
-    const firebaseApp = initializeApp(firebaseConfig);
-    auth = getAuth(firebaseApp);
-    db = getFirestore(firebaseApp);
+        console.clear(); // Очищаем консоль для чистого старта
+        // Инициализация Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        auth = getAuth(firebaseApp);
+        db = getFirestore(firebaseApp);
 
-    // Устанавливаем сохранение сессии Firebase
-    await setPersistence(auth, browserLocalPersistence);
+        // Устанавливаем сохранение сессии Firebase
+        await setPersistence(auth, browserLocalPersistence);
 
-    let user;
-    try {
-    // Проверяем наличие __initial_auth_token и используем его, иначе анонимная аутентификация
-    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== '') {
-    await signInWithCustomToken(auth, __initial_auth_token);
-    user = auth.currentUser; // Получаем пользователя после аутентификации
-} else {
-    user = await signInAnonymously(auth); // Анонимная аутентификация
-}
-    userId = user.uid;
-} catch (error) {
-    console.error("Ошибка аутентификации Firebase:", error);
-    addBotMessage('<p class="text-red-400">⚠️ Не удалось подключиться к игре. Пожалуйста, проверьте ваше интернет-соединение и настройки Firebase.</p>');
-    loadingScreen.style.display = 'none';
-    appContainer.style.display = 'flex';
-    return;
-}
+        let user;
+        try {
+            // Проверяем наличие __initial_auth_token и используем его, иначе анонимная аутентификация
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== '') {
+                await signInWithCustomToken(auth, __initial_auth_token);
+                user = auth.currentUser; // Получаем пользователя после аутентификации
+            } else {
+                user = await signInAnonymously(auth); // Анонимная аутентификация
+            }
+            userId = user.uid;
+        } catch (error) {
+            console.error("Ошибка аутентификации Firebase:", error);
+            addBotMessage('<p class="text-red-400">⚠️ Не удалось подключиться к игре. Пожалуйста, проверьте ваше интернет-соединение и настройки Firebase.</p>');
+            loadingScreen.style.display = 'none';
+            appContainer.style.display = 'flex';
+            return;
+        }
 
-    // Загрузка данных игрока
-    const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
-    const playerDocSnap = await getDoc(playerDocRef);
+        // Загрузка данных игрока
+        const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
+        const playerDocSnap = await getDoc(playerDocRef);
 
-    if (playerDocSnap.exists()) {
-    gameState.player = playerDocSnap.data();
-    // Убеждаемся, что все новые поля инициализированы, если они отсутствуют в старых сохранениях
-    if (typeof gameState.player.bitcoin === 'undefined') gameState.player.bitcoin = 0;
-    if (typeof gameState.player.euro === 'undefined') gameState.player.euro = 0;
-    if (typeof gameState.player.mining === 'undefined') gameState.player.mining = { active: false, level: 0, speed: 0, interval: 0, lastMined: 0 };
-    if (typeof gameState.player.deposits === 'undefined') gameState.player.deposits = [];
-    if (typeof gameState.player.lastPensionClaim === 'undefined') gameState.player.lastPensionClaim = 0;
-    if (typeof gameState.player.lastBonusClaim === 'undefined') gameState.player.lastBonusClaim = 0;
-    if (typeof gameState.player.bonusStreak === 'undefined') gameState.player.bonusStreak = 0; // Добавляем bonusStreak
-    if (typeof gameState.player.businessSlots === 'undefined') gameState.player.businessSlots = 1;
-    if (typeof gameState.player.businesses === 'undefined') gameState.player.businesses = [];
-    if (typeof gameState.player.inventory === 'undefined') gameState.player.inventory = [];
-    if (typeof gameState.promocodes === 'undefined') gameState.promocodes = {}; // Инициализация промокодов
-    // Восстанавливаем объекты Date для lastPayout в бизнесах
-    gameState.player.businesses.forEach(b => {
-    if (b.lastPayout && typeof b.lastPayout.toDate === 'function') {
-    b.lastPayout = b.lastPayout.toDate().getTime(); // Преобразуем Timestamp в число
-}
-});
+        if (playerDocSnap.exists()) {
+            gameState.player = playerDocSnap.data();
+            // Убеждаемся, что все новые поля инициализированы, если они отсутствуют в старых сохранениях
+            if (typeof gameState.player.bitcoin === 'undefined') gameState.player.bitcoin = 0;
+            if (typeof gameState.player.euro === 'undefined') gameState.player.euro = 0;
+            if (typeof gameState.player.mining === 'undefined') gameState.player.mining = { active: false, level: 0, speed: 0, interval: 0, lastMined: 0 };
+            if (typeof gameState.player.deposits === 'undefined') gameState.player.deposits = [];
+            if (typeof gameState.player.lastPensionClaim === 'undefined') gameState.player.lastPensionClaim = 0;
+            if (typeof gameState.player.lastBonusClaim === 'undefined') gameState.player.lastBonusClaim = 0;
+            if (typeof gameState.player.bonusStreak === 'undefined') gameState.player.bonusStreak = 0; // Добавляем bonusStreak
+            if (typeof gameState.player.businessSlots === 'undefined') gameState.player.businessSlots = 1;
+            if (typeof gameState.player.businesses === 'undefined') gameState.player.businesses = [];
+            if (typeof gameState.player.inventory === 'undefined') gameState.player.inventory = [];
+            if (typeof gameState.promocodes === 'undefined') gameState.promocodes = {}; // Инициализация промокодов
+            // Восстанавливаем объекты Date для lastPayout в бизнесах
+            gameState.player.businesses.forEach(b => {
+                if (b.lastPayout && typeof b.lastPayout.toDate === 'function') {
+                    b.lastPayout = b.lastPayout.toDate().getTime(); // Преобразуем Timestamp в число
+                }
+            });
 
-    // Корректное преобразование joinDate из Timestamp в число (если сохранено как Timestamp)
-    if (gameState.player.joinDate && typeof gameState.player.joinDate.toDate === 'function') {
-    gameState.player.joinDate = gameState.player.joinDate.toDate().getTime();
-}
-    // Восстанавливаем Date для lastMined в mining
-    if (gameState.player.mining && gameState.player.mining.lastMined && typeof gameState.player.mining.lastMined.toDate === 'function') {
-    gameState.player.mining.lastMined = gameState.player.mining.lastMined.toDate().getTime();
-}
-    // Восстанавливаем Date для deposits
-    gameState.player.deposits.forEach(dep => {
-    if (dep.payoutTime && typeof dep.payoutTime.toDate === 'function') {
-    dep.payoutTime = dep.payoutTime.toDate().getTime();
-}
-    if (dep.createdAt && typeof dep.createdAt.toDate === 'function') {
-    dep.createdAt = dep.createdAt.toDate().getTime();
-}
-});
+            // Корректное преобразование joinDate из Timestamp в число (если сохранено как Timestamp)
+            if (gameState.player.joinDate && typeof gameState.player.joinDate.toDate === 'function') {
+                gameState.player.joinDate = gameState.player.joinDate.toDate().getTime();
+            }
+            // Восстанавливаем Date для lastMined в mining
+            if (gameState.player.mining && gameState.player.mining.lastMined && typeof gameState.player.mining.lastMined.toDate === 'function') {
+                gameState.player.mining.lastMined = gameState.player.mining.lastMined.toDate().getTime();
+            }
+            // Восстанавливаем Date для deposits
+            gameState.player.deposits.forEach(dep => {
+                if (dep.payoutTime && typeof dep.payoutTime.toDate === 'function') {
+                    dep.payoutTime = dep.payoutTime.toDate().getTime();
+                }
+                if (dep.createdAt && typeof dep.createdAt.toDate === 'function') {
+                    dep.createdAt = dep.createdAt.toDate().getTime();
+                }
+            });
 
 
-} else {
-    // Новый игрок
-    const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-    gameState.player = {
-    name: userInfo.first_name || 'Игрок', // Используем 'Игрок' как запасной вариант
-    balance: 10000,
-    xp: 0,
-    level: 1,
-    bitcoin: 0,
-    euro: 0,
-    mining: { active: false, level: 0, speed: 0, interval: 0, lastMined: 0 },
-    deposits: [],
-    lastPensionClaim: 0,
-    lastBonusClaim: 0,
-    bonusStreak: 0, // Инициализация серии бонусов
-    joinDate: Date.now(),
-    businessSlots: 1,
-    businesses: [],
-    inventory: []
-};
-    gameState.promocodes = {}; // Инициализация промокодов для нового игрока
-    await savePlayerState(); // Сохраняем начальное состояние
-}
+        } else {
+            // Новый игрок
+            const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+            gameState.player = {
+                name: userInfo.first_name || 'Игрок', // Используем 'Игрок' как запасной вариант
+                balance: 10000,
+                xp: 0,
+                level: 1,
+                bitcoin: 0,
+                euro: 0,
+                mining: { active: false, level: 0, speed: 0, interval: 0, lastMined: 0 },
+                deposits: [],
+                lastPensionClaim: 0,
+                lastBonusClaim: 0,
+                bonusStreak: 0, // Инициализация серии бонусов
+                joinDate: Date.now(),
+                businessSlots: 1,
+                businesses: [],
+                inventory: []
+            };
+            gameState.promocodes = {}; // Инициализация промокодов для нового игрока
+            await savePlayerState(); // Сохраняем начальное состояние
+        }
 
-    // Общие игровые состояния
-    gameState.currentMenu = 'main';
-    gameState.menuHistory = [];
-    gameState.exchangeRates = { btcToUsd: 50000000, usdToEur: 0.92 }; // Примерные курсы
+        // Общие игровые состояния
+        gameState.currentMenu = 'main';
+        gameState.menuHistory = [];
+        gameState.exchangeRates = { btcToUsd: 50000000, usdToEur: 0.92 }; // Примерные курсы
 
-    loadingScreen.style.display = 'none';
-    appContainer.style.display = 'flex';
+        loadingScreen.style.display = 'none';
+        appContainer.style.display = 'flex';
 
-    addBotMessage('<p>👋 Добро пожаловать!</p>');
-    showView('main');
-    setInterval(gameTick, 1000); // Запускаем игровой тик каждую секунду
-});
+        addBotMessage('<p>👋 Добро пожаловать!</p>');
+        showView('main');
+        setInterval(gameTick, 1000); // Запускаем игровой тик каждую секунду
+    });
 </script>
 
 </body>
