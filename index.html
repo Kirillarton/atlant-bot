@@ -791,7 +791,7 @@
             const item = config.donationCases[key];
             msg += `<p>${item.icon} <b>${item.name}</b><br>Цена: ${item.price} голосов VK</p>`;
             if (item.content.balance) msg += `<p>   Награда: ${formatCurrency(item.content.balance)}</p>`;
-            if (item.content.bitcoin) msg += `<p>   Награда: ${formatBTC(item.content.bitcoin)}</p>`;
+            if (item.content.bitcoin) msg += `<p>   Награда: ${formatBTC(item.content.bitcoin)}</p當中`;
             if (item.content.euro) msg += `<p>   Награда: ${formatEuro(item.content.euro)}</p>`;
             if (item.content.items && item.content.items.length > 0) {
                 item.content.items.forEach(cItem => {
