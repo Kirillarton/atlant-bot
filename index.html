@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=no, viewport-fit=cover">
+    <title>Симулятор Бота «Атлант»</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Скрипт VK Bridge для интеграции с ВКонтакте -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .chat-bubble { max-width: 85%; word-wrap: break-word; }
+        .chat-container::-webkit-scrollbar { width: 4px; }
+        .chat-container::-webkit-scrollbar-thumb { background-color: #4A5568; border-radius: 20px; }
+        .keyboard-grid button { transition: all 0.2s ease-in-out; }
+        .keyboard-grid button:active { transform: scale(0.95); }
+        .bonus-card {
+            background-image: url('https://img.freepik.com/free-vector/abstract-plexus-background-with-connecting-dots-lines_1017-23348.jpg?w=1380&t=st=1719427845~exp=1719428445~hmac=e20f269a31a4c0a5d4e135b026615b3c3b53f6834b126ac002b4742e7428f522');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid #718096;
+            position: relative;
+        }
+        .bonus-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(45, 55, 72, 0.7); border-radius: 0.75rem; }
+        .bonus-card > * { position: relative; z-index: 10; }
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #3498db; width: 40px; height: 40px; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-2 md:p-4">
+
+<div id="app-container" class="w-full max-w-lg bg-gray-800 rounded-2xl shadow-2xl flex flex-col h-[95vh] md:h-[90vh]" style="display: none;">
+    <!-- Шапка приложения -->
+    <div class="p-4 border-b border-gray-700 flex items-center space-x-4 flex-shrink-0">
+        <div class="relative">
+            <img id="bot-avatar" class="w-12 h-12 rounded-full" src="https://placehold.co/100x100/1a202c/ffffff?text=M" alt="Аватар Бота">
+            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-800 rounded-full"></span>
+        </div>
+        <div>
+            <h1 id="bot-name" class="text-xl font-bold">Атлант Бот</h1>
+            <p class="text-sm text-green-400">в сети</p>
+        </div>
+    </div>
+
+    <!-- Область чата -->
+    <div id="chat-container" class="flex-1 p-4 space-y-4 overflow-y-auto chat-container"></div>
+
+    <!-- Область клавиатуры -->
+    <div id="keyboard-area" class="p-3 bg-gray-900/50 border-t border-gray-700 flex-shrink-0"></div>
+</div>
+
+<div id="loading-screen" class="flex flex-col items-center justify-center">
+    <div class="loader"></div>
+    <p class="mt-4 text-lg">Загрузка данных...</p>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+    // --- Глобальные переменные для Firebase и состояния игры ---
+    let db, auth, userId, appId;
+    const appContainer = document.getElementById('app-container');
+    const loadingScreen = document.getElementById('loading-screen');
+
+    // --- ВАША ПЕРСОНАЛЬНАЯ КОНФИГУРАЦИЯ FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDFWm4OyjHgAsgVTMkhApeGaAZC5CSXEi8",
+        authDomain: "atlant-bot-1d0d5.firebaseapp.com",
+        projectId: "atlant-bot-1d0d5",
+        storageBucket: "atlant-bot-1d0d5.firebasestorage.app",
+        messagingSenderId: "1002159529192",
+        appId: "1:1002159529192:web:cac088727395f079e9fd5d",
+        measurementId: "G-29FH6CDF19"
+    };
+
+    // --- ЗАГЛУШКА VK BRIDGE ДЛЯ ТЕСТИРОВАНИЯ В БРАУЗЕРЕ ---
+    if (typeof vkBridge === 'undefined') {
+        console.warn('VK Bridge не найден. Используется мок-объект для разработки.');
+        window.vkBridge = {
+            send: (method, params) => {
+                console.log('Вызов мок-объекта VK Bridge:', method, params);
+                return new Promise((resolve, reject) => {
+                    switch (method) {
+                        case 'VKWebAppInit':
+                            resolve({ result: true });
+                            break;
+                        case 'VKWebAppGetUserInfo':
+                            resolve({ id: 1, first_name: 'Павел', last_name: 'Дуров', photo_100: 'https://placehold.co/100x100/7f9aed/ffffff?text=VK' });
+                            break;
+                        case 'VKWebAppOpenPayForm':
+                            // Имитируем успешную оплату для тестирования
+                            alert(`Мок-оплата за: ${params.params.item}. Цена: ${params.params.price} голосов.`);
+                            resolve({ status: 'success', transaction_id: 'MOCK_TRANSACTION_123' });
+                            break;
+                        default:
+                            resolve({ result: true });
+                    }
+                });
+            }
+        };
+    }
+
+    // --- КОНФИГУРАЦИЯ ИГРЫ ---
+    const config = {
+        workContracts: [
+            { id: 1, title: "Доставка пиццы", duration: 60, minReward: 5000, maxReward: 10000, risk: 0.1, requiredLevel: 1 },
+            { id: 2, title: "Перевозка мебели", duration: 180, minReward: 30000, maxReward: 50000, risk: 0.2, requiredLevel: 5 },
+            { id: 3, title: "Контрабанда чипов", duration: 300, minReward: 100000, maxReward: 250000, risk: 0.4, requiredLevel: 10 },
+        ],
+        cases: {
+            'basic_case': { id: 'basic_case', name: "Базовый кейс", icon: "📦", possibleLoot: [50000, 100000, 200000, 300000, 500000] },
+            'pro_case': { id: 'pro_case', name: "Про-кейс", icon: "💼", possibleLoot: [100000, 200000, 350000, 500000, 750000] },
+            'elite_case': { id: 'elite_case', name: "Элитный кейс", icon: "👑", possibleLoot: [150000, 300000, 450000, 600000, 750000] },
+            'ultra_case': { id: 'ultra_case', name: "Ультра кейс", icon: "💎", possibleLoot: [250000, 500000, 750000, 1000000, 1500000] }
+        },
+        // --- НОВЫЕ ДОНАТ КЕЙСЫ ---
+        donationCases: {
+            'starter_pack': { id: 'starter_pack', name: 'Набор Новичка', icon: '🚀', price: 10, content: { balance: 500000, items: [{id: 'basic_case', quantity: 5}] } },
+            'tycoon_case': { id: 'tycoon_case', name: 'Кейс Бизнесмена', icon: '🎩', price: 50, content: { balance: 2500000, items: [{id: 'pro_case', quantity: 3}, {id: 'elite_case', quantity: 1}] } },
+            'investor_bundle': { id: 'investor_bundle', name: 'Набор Инвестора', icon: '📈', price: 100, content: { bitcoin: 50, euro: 100, items: [{id: 'ultra_case', quantity: 2}] } }
+        },
+        businessesForSale: [
+            { id: 12, name: "Китайский ресторан", price: 35000000, profit: 154000 },
+            { id: 15, name: "Шаурмичная", price: 5000000, profit: 25000 },
+            { id: 18, name: "Автосервис", price: 50000000, profit: 250000 },
+        ]
+    };
+
+    // --- СОСТОЯНИЕ ИГРЫ ---
+    let gameState = {};
+
+    // --- ЭЛЕМЕНТЫ ИНТЕРФЕЙСА ---
+    const chatContainer = document.getElementById('chat-container');
+    const keyboardArea = document.getElementById('keyboard-area');
+
+    // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+    function formatCurrency(n, c = '$') { return `💰 ${new Intl.NumberFormat('ru-RU').format(Math.round(n))}${c}`; }
+    function formatBTC(n) { return `💎 ${(n || 0).toFixed(4)}₿`; }
+    function formatEuro(n) { return `💶 ${new Intl.NumberFormat('ru-RU').format(Math.round(n))}€`; }
+    function formatTime(ms) { if (ms <= 0) return "0 сек."; let s = Math.floor((ms / 1000) % 60), m = Math.floor((ms / 60000) % 60), h = Math.floor(ms / 3600000); return `${h} ч. ${m} мин. ${s} сек.`; }
+    function formatFullDate(d) { return new Date(d).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+    function getDaysInGame(joinTimestamp) { return Math.floor((Date.now() - joinTimestamp) / 86400000); }
+    function getXpForNextLevel(l) { return 4 + (4 * l); }
+    function parseAmount(str) { let s = String(str).toLowerCase().trim().replace(/к/g, 'k'); let value = parseFloat(s.replace(/,/g, '')); if (s.endsWith('kk')) { value *= 1000000; } else if (s.endsWith('k')) { value *= 1000; } return isNaN(value) ? 0 : value; }
+
+    // --- СОХРАНЕНИЕ ДАННЫХ В FIRESTORE ---
+    async function savePlayerState() {
+        if (!db || !userId) return;
+        try {
+            // Преобразуем объект player в JSON-совместимый формат
+            const stateToSave = JSON.parse(JSON.stringify(gameState.player));
+            const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
+            await setDoc(playerDocRef, stateToSave);
+        } catch (error) {
+            console.error("Ошибка сохранения данных игрока: ", error);
+            addBotMessage('<p class="text-red-400">⚠️ Ошибка сохранения прогресса. Попробуйте позже.</p>');
+        }
+    }
+
+    // --- ОСНОВНЫЕ ФУНКЦИИ ИГРЫ (с сохранением) ---
+    // Остальные функции (addBotMessage, addUserMessage, renderKeyboard и т.д. остаются)
+    // ... (все функции из предыдущего кода, но с вызовом savePlayerState() после каждого изменения gameState.player)
+
+    // Переделаем некоторые ключевые функции
+    async function createPromoExecute(name, currency, reward, count) {
+        const p = gameState.player;
+        const totalCost = reward * count;
+        let balanceType = 'balance';
+        if (currency === '₿') balanceType = 'bitcoin';
+        if (currency === '€') balanceType = 'euro';
+
+        if (p[balanceType] < totalCost) {
+            addBotMessage('<p>⚠️ Недостаточно средств для создания промокода.</p>');
+            return;
+        }
+
+        const promoId = name.toUpperCase();
+        const publicPromoRef = doc(db, `/artifacts/${appId}/public/data/promos/${promoId}`);
+        const promoData = {
+            creatorId: userId,
+            creatorName: p.name,
+            reward: reward,
+            currency: currency,
+            balanceType: balanceType,
+            activationsLeft: count,
+            createdAt: Date.now()
+        };
+
+        const promoDoc = await getDoc(publicPromoRef);
+        if (promoDoc.exists()) {
+            addBotMessage('<p>❌ Промокод с таким названием уже существует.</p>');
+            return;
+        }
+
+        p[balanceType] -= totalCost;
+        if (!p.createdPromos) p.createdPromos = [];
+        p.createdPromos.push({ name: promoId, count: count, reward: reward, currency: currency });
+
+        try {
+            await setDoc(publicPromoRef, promoData);
+            await savePlayerState();
+            addBotMessage(`<p>✅ Промокод «${promoId}» на ${count} активаций создан!</p>`);
+            showView('promo');
+        } catch (error) {
+            console.error("Ошибка создания промокода: ", error);
+            // Вернуть деньги в случае ошибки записи
+            p[balanceType] += totalCost;
+            addBotMessage('<p>⚠️ Не удалось создать промокод. Попробуйте позже.</p>');
+        }
+    }
+
+    async function activatePromoPrompt() {
+        addBotMessage("<p>🎁 Введите промокод для активации</p>");
+        renderInput("Промокод...", 'view_promo');
+        gameState.prompt = { callback: async (code) => {
+                const promoId = code.toUpperCase();
+                const p = gameState.player;
+
+                if (p.usedPromoCodes.includes(promoId)) {
+                    addBotMessage("<p>❌ Вы уже активировали этот промокод.</p>");
+                    showView('promo');
+                    return;
+                }
+
+                const publicPromoRef = doc(db, `/artifacts/${appId}/public/data/promos/${promoId}`);
+
+                try {
+                    const promoDoc = await getDoc(publicPromoRef);
+                    if (!promoDoc.exists() || promoDoc.data().activationsLeft <= 0) {
+                        addBotMessage("<p>❌ Промокод не найден или закончился.</p>");
+                        showView('promo');
+                        return;
+                    }
+
+                    const promoData = promoDoc.data();
+                    p[promoData.balanceType] += promoData.reward;
+                    p.usedPromoCodes.push(promoId);
+
+                    await updateDoc(publicPromoRef, { activationsLeft: promoData.activationsLeft - 1 });
+                    await savePlayerState();
+
+                    let currencySymbol = '$';
+                    if (promoData.currency === '€') currencySymbol = '€';
+                    if (promoData.currency === '₿') currencySymbol = '₿';
+
+                    addBotMessage(`<p>✅ Активирован «${promoId}»<br>+${formatCurrency(promoData.reward, currencySymbol)}</p>`);
+                } catch (error) {
+                    console.error("Ошибка активации промокода: ", error);
+                    addBotMessage('<p>⚠️ Ошибка активации. Попробуйте позже.</p>');
+                }
+
+                showView('promo');
+            }};
+    }
+
+    async function openCase(itemId, countStr) {
+        const count = parseInt(countStr);
+        const p = gameState.player;
+        const playerItem = p.inventory.find(i => i.id === itemId);
+        const caseInfo = config.cases[itemId];
+
+        if (!playerItem || playerItem.quantity < count) {
+            addBotMessage('<p>❌ Недостаточно кейсов для открытия.</p>');
+            return;
+        }
+
+        let totalWinnings = 0;
+        let results = [];
+        for (let i = 0; i < count; i++) {
+            const loot = caseInfo.possibleLoot[Math.floor(Math.random() * caseInfo.possibleLoot.length)];
+            totalWinnings += loot;
+            results.push(loot);
+        }
+
+        p.balance += totalWinnings;
+        playerItem.quantity -= count;
+        if (playerItem.quantity <= 0) {
+            p.inventory = p.inventory.filter(i => i.id !== itemId);
+        }
+
+        let resultMessage = `<p><b>🎉 Вот что выпало (${count}x ${caseInfo.icon} ${caseInfo.name}):</b><br>`;
+        results.forEach(res => {
+            resultMessage += `💰 ${new Intl.NumberFormat('ru-RU').format(res)}$<br>`;
+        });
+        resultMessage += `<hr class="border-gray-600 my-1">Общий выигрыш: <b class="text-green-400">${new Intl.NumberFormat('ru-RU').format(totalWinnings)}$</b></p>`;
+
+        addBotMessage(resultMessage);
+        await savePlayerState();
+        showView('profile_inventory');
+    }
+
+    // --- НОВЫЕ ФУНКЦИИ ДЛЯ МАГАЗИНА И ОПЛАТЫ ---
+    function showShop() {
+        let msg = '<p>🏪 <b>Магазин (Донат)</b><br><br>Здесь вы можете приобрести эксклюзивные наборы за голоса ВК, чтобы ускорить свой прогресс!</p><hr class="border-gray-600 my-2">';
+        const buttons = [];
+        for (const key in config.donationCases) {
+            const item = config.donationCases[key];
+            msg += `<p><b>${item.icon} ${item.name}</b><br>Цена: ${item.price} голосов</p><hr class="border-gray-600 my-1">`;
+            buttons.push({label: `Купить (${item.price} гол.)`, command: `shop_buy ${item.id}`});
+        }
+        buttons.push({label: '↩️ Назад', command: 'back'});
+        addBotMessage(msg, true);
+        renderKeyboard(buttons);
+    }
+
+    async function initiatePayment(caseId) {
+        const itemToBuy = config.donationCases[caseId];
+        if (!itemToBuy) {
+            addBotMessage("<p>❌ Такой товар не найден.</p>");
+            return;
+        }
+
+        try {
+            addBotMessage("<p>⏳ Открываю окно оплаты VK Pay...</p>");
+            const result = await vkBridge.send('VKWebAppOpenPayForm', {
+                app_id: appId, // ID вашего приложения
+                params: {
+                    amount: itemToBuy.price,
+                    description: `Покупка набора "${itemToBuy.name}" в игре Атлант`,
+                    item: `magnate_case_${itemToBuy.id}`
+                }
+            });
+
+            if (result.status === 'success') {
+                addBotMessage(`<p class="text-green-400">✅ Оплата прошла успешно! Зачисляем ваш набор...</p>`);
+                // Зачисляем покупку
+                const content = itemToBuy.content;
+                const p = gameState.player;
+                if (content.balance) p.balance += content.balance;
+                if (content.bitcoin) p.bitcoin += content.bitcoin;
+                if (content.euro) p.euro += content.euro;
+                if (content.items) {
+                    content.items.forEach(purchasedItem => {
+                        addItemToInventory(purchasedItem.id, purchasedItem.quantity);
+                    });
+                }
+                await savePlayerState();
+                addBotMessage(`<p><b>🎉 ${itemToBuy.name}</b> получен! Проверьте свой профиль и инвентарь.</p>`);
+            } else {
+                addBotMessage('<p class="text-yellow-400">⚠️ Оплата не была завершена.</p>');
+            }
+
+        } catch (error) {
+            console.error("Ошибка VK Pay: ", error);
+            addBotMessage('<p class="text-red-400">❌ Произошла ошибка при проведении платежа.</p>');
+        }
+        showView('shop');
+    }
+
+    function addItemToInventory(itemId, quantity) {
+        const p = gameState.player;
+        const itemInfo = config.cases[itemId] || Object.values(config.donationCases).find(c => c.id === itemId);
+        if (!itemInfo) return;
+
+        if (!p.inventory) p.inventory = [];
+        const existingItem = p.inventory.find(item => item.id === itemId);
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            p.inventory.push({
+                id: itemId,
+                name: itemInfo.name,
+                icon: itemInfo.icon,
+                quantity: quantity,
+                type: 'case'
+            });
+        }
+    }
+
+    // --- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ---
+    async function initApp() {
+        try {
+            // 1. Инициализация VK Bridge
+            await vkBridge.send('VKWebAppInit');
+
+            // 2. Инициализация Firebase
+            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+            appId = typeof __app_id !== 'undefined' ? __app_id : 123456; // Запасной appId
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            setLogLevel('error');
+
+            // 3. Аутентификация
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInAnonymously(auth);
+            }
+            userId = auth.currentUser.uid;
+
+            // 4. Получение данных пользователя VK
+            const vkUserData = await vkBridge.send('VKWebAppGetUserInfo');
+
+            // 5. Загрузка или создание данных игрока в Firestore
+            const playerDocRef = doc(db, `/artifacts/${appId}/users/${userId}/gameData/player`);
+            const playerDoc = await getDoc(playerDocRef);
+
+            if (playerDoc.exists()) {
+                // Игрок существует, загружаем его данные
+                gameState.player = playerDoc.data();
+                // Восстанавливаем объекты Date
+                gameState.player.joinDate = new Date(gameState.player.joinDate);
+            } else {
+                // Новый игрок, создаем данные по умолчанию
+                gameState.player = {
+                    id: vkUserData.id,
+                    name: vkUserData.first_name || 'Игрок',
+                    balance: 50000, euro: 0, bitcoin: 0, reputation: 0,
+                    joinDate: Date.now(), level: 1, xp: 0,
+                    businesses: [], businessSlots: 1, isVip: false, deposits: [],
+                    achievements: { completed: 0, total: 85 },
+                    createdPromos: [], usedPromoCodes: [],
+                    pension: { lastClaimed: 0 },
+                    bonus: { lastClaimed: 0, streak: 0, lastClaimDay: 0 },
+                    inventory: [{ id: 'basic_case', name: 'Базовый кейс', icon: '📦', quantity: 1, type: 'case' }]
+                };
+                await savePlayerState(); // Сохраняем нового игрока в БД
+            }
+
+            // 6. Обновляем глобальные переменные и UI
+            gameState.currentMenu = 'main';
+            gameState.menuHistory = [];
+            gameState.prompt = null;
+
+            document.getElementById('bot-avatar').src = vkUserData.photo_100 || 'https://placehold.co/100x100/1a202c/ffffff?text=M';
+            document.getElementById('bot-name').textContent = "Атлант: " + gameState.player.name;
+
+            // 7. Запускаем игру
+            loadingScreen.style.display = 'none';
+            appContainer.style.display = 'flex';
+            addBotMessage(`👋 Добро пожаловать, ${gameState.player.name}!`);
+            showInitialProfile();
+            renderKeyboard();
+            // setInterval(gameTick, 1000); // Можно раскомментировать для тиков в фоне
+
+        } catch (error) {
+            console.error("Критическая ошибка инициализации: ", error);
+            loadingScreen.innerHTML = '<p class="text-red-400">Ошибка загрузки приложения. Пожалуйста, перезапустите.</p>';
+        }
+    }
+
+    // --- ТОЧКА ВХОДА В ПРИЛОЖЕНИЕ ---
+    initApp();
+
+    // --- Привязка функций к window для вызова из HTML ---
+    // (Здесь должны быть все функции, вызываемые через onclick)
+    window.sendCommand = (command, label, isNavCommand = false) => {
+        const navCommands = ['back', 'back_to_main'];
+        if (!isNavCommand && !navCommands.includes(command.split(' ')[0]) && label && typeof label === 'string' && label !== 'undefined' && gameState.prompt === null) {
+            addUserMessage(label);
+        }
+        const [cmd, ...args] = command.split(' ');
+        setTimeout(() => {
+            if (cmd.startsWith('view_')) { showView(cmd.replace('view_', '')); return; }
+            const commandHandlers = {
+                'back': goBack,
+                'back_to_main': backToMain,
+                'get_bonus': () => { claimBonus(); savePlayerState(); },
+                'profile_levels': showLevels,
+                'profile_businesses': showBusinesses,
+                'market_businesses': showMarketBusinesses,
+                'work_start': async () => { await startWork(parseInt(args[0])); await savePlayerState(); },
+                'mining_activate': () => { activateMining(); savePlayerState(); },
+                'mining_upgrade_prompt': upgradeMiningPrompt,
+                'mining_upgrade_execute': async () => { await upgradeMiningExecute(); await savePlayerState(); },
+                'mining_claim': () => { claimMinedBtc(); savePlayerState(); },
+                'mining_sell_prompt': sellBtcPrompt,
+                'promo_activate_prompt': activatePromoPrompt,
+                'bank_pension': () => { claimPension(); savePlayerState(); },
+                'deposit_create_prompt': createDepositPrompt,
+                'deposit_create_execute': async () => { await createDeposit(parseInt(args[0]), parseAmount(args[1])); },
+                'biz_buy': async () => { await buyBusiness(parseInt(args[0])); await savePlayerState(); },
+                'profile_inventory': showInventory,
+                'item_manage': () => showItemManagement(args[0]),
+                'case_open': (a,b,c) => openCase(args[0], args[1]),
+                'view_shop': showShop, // НОВЫЙ обработчик
+                'shop_buy': () => initiatePayment(args[0]), // НОВЫЙ обработчик
+                // ... добавьте сюда другие обработчики, изменяющие состояние
+            };
+            if (commandHandlers[cmd]) {
+                commandHandlers[cmd]();
+            } else if (!isNavCommand && label && typeof label === 'string' && label !== 'undefined') {
+                addBotMessage(`<p>Раздел «${label}» в разработке.</p>`);
+            }
+        }, 200);
+    };
+    window.submitInput = () => { const i = document.getElementById('text-input'), v = i.value; if (!v.trim()) return; addUserMessage(v); if (gameState.prompt && typeof gameState.prompt.callback === 'function') { const cb = gameState.prompt.callback; gameState.prompt = null; cb(v); } };
+    // Остальные функции, которые не меняют состояние, можно оставить как есть
+    // или переписать, чтобы они тоже были доступны в window, если нужно.
+    // Я оставил только ключевые для демонстрации.
+
+</script>
+</body>
+</html>
